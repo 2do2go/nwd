@@ -1,0 +1,22 @@
+{
+	"name": "nwd",
+	"description": "pure node.js implementation of Selenium WebDriver Wire Protocol",
+	"version": "0.1.0-alpha",
+	"author": "Oleg Korobenko <oleg.korobenko@gmail.com>",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/2do2go/nwd"
+	},
+	"keywords": [
+		"webdriver", "selenium", "test", "browser"
+	],
+	"scripts": {
+		"test": "mocha test --reporter spec --bail --async-only"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"mocha": "1.11.0",
+		"expect.js": "0.2.0"
+	},
+	 "main": "./lib/index"
+}

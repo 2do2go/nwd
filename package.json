@@ -16,7 +16,9 @@
 	"dependencies": {},
 	"devDependencies": {
 		"mocha": "1.11.0",
-		"expect.js": "0.2.0"
+		"expect.js": "0.2.0",
+		"co": "3.0.2",
+		"thunkify": "0.0.1"
 	},
 	 "main": "./lib/index"
 }

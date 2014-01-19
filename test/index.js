@@ -20,7 +20,7 @@ function getFixturePath(name) {
 describe('webdriver', function() {
 	this.timeout(8000);
 	var driver = null;
-	
+
 	it('init without errors', function(done) {
 		driver = new WebDriver(driverParams);
 		driver.init(done);

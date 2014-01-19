@@ -16,6 +16,20 @@ function getFixturePath(name) {
 	return 'file://' + __dirname + '/fixtures/' + name;
 }
 
+function expectAndDone(assert, done) {
+	return function (err, value) {
+		if (err) return done(err);
+		assert(value);
+		done();
+	}
+}
+
+// expect that callback returns instance of WebDriver and done the test
+function expectForDriverAndDone(done) {
+	return expectAndDone(function(value) {
+		expect(value).to.be.a(WebDriver);
+	}, done);
+}
 
 describe('webdriver', function() {
 	this.timeout(8000);
@@ -23,19 +37,19 @@ describe('webdriver', function() {
 
 	it('init without errors', function(done) {
 		driver = new WebDriver(driverParams);
-		driver.init(done);
+		driver.init(expectForDriverAndDone(done));
 	});
 
 	it('delete cookie', function(done) {
-		driver.deleteCookie(done);
+		driver.deleteCookie(expectForDriverAndDone(done));
 	});
 
 	it('maximize window', function(done) {
-		driver.maximizeWindow(done);
+		driver.maximizeWindow(expectForDriverAndDone(done));
 	});
 
 	it('navigate to fixture page', function(done) {
-		driver.setUrl(getFixturePath('github.html'), done);
+		driver.setUrl(getFixturePath('github.html'), expectForDriverAndDone(done));
 	});
 
 	it('return current page url', function(done) {
@@ -97,5 +111,9 @@ describe('webdriver', function() {
 				done();
 			}
 		);
+	});
+
+	it('delete session', function(done) {
+		driver.deleteSession(expectForDriverAndDone(done));
 	});
 });

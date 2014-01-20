@@ -223,10 +223,18 @@ describe('webdriver', function() {
 		});
 	});
 
-	it('get placeholder attribute', function(done) {
+	it('get placeholder attribute for login element', function(done) {
 		loginElement.getAttr('placeholder', function(err, placeholder) {
 			if (err) return done(err);
 			expect(placeholder).equal('Pick a username');
+			done();			
+		});
+	});
+
+	it('get tag name of login element', function(done) {
+		loginElement.getTagName(function(err, name) {
+			if (err) return done(err);
+			expect(name).equal('input');
 			done();			
 		});
 	});
@@ -252,6 +260,21 @@ describe('webdriver', function() {
 			if (err) return done(err);
 			expect(login).equal('');
 			done();
+		});
+	});
+
+	it('get text of heading element', function(done) {
+		driver.get({
+			selector: '.heading',
+			strategy: 'css selector'
+		}, function(err, headingElement) {
+			if (err) return done(err);
+			expectWebElement(headingElement);
+			headingElement.getText(function(err, text) {
+				if (err) return done(err);
+				expect(text).equal('Build software better, together.');
+				done();
+			});
 		});
 	});
 

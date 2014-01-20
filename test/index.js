@@ -1,7 +1,8 @@
 'use strict';
 
 var expect = require('expect.js'),
-	WebDriver = require('../lib').WebDriver;
+	WebDriver = require('../lib').WebDriver,
+	errors = require('../lib').errors;
 
 var driverParams = {
 	host: '127.0.0.1',
@@ -32,7 +33,7 @@ function expectForDriverAndDone(done) {
 }
 
 describe('webdriver', function() {
-	this.timeout(8000);
+	this.timeout(10000);
 	var driver = null;
 
 	it('init without errors', function(done) {
@@ -111,6 +112,52 @@ describe('webdriver', function() {
 				done();
 			}
 		);
+	});
+
+	it('get element using css selector', function(done) {
+		driver.getId({
+			selector: '[name="user[login]"]',
+			strategy: 'css selector'
+		}, function(err, id) {
+			if (err) return done(err);
+			expect(Number(id)).to.be.a('number');
+			done();
+		});
+	});
+
+	it('get non-existing element return error', function(done) {
+		driver.getId({
+			selector: '[name="non-existing"]',
+			strategy: 'css selector'
+		}, function(err, id) {
+			expect(err).to.be.a(errors.NoSuchElementError);
+			done();
+		});
+	});
+
+	it('get elements using selector', function(done) {
+		driver.getIds({
+			selector: '.textfield',
+			strategy: 'css selector'
+		}, function(err, ids) {
+			if (err) return done(err);
+			expect(ids.length).greaterThan(1);
+			ids.forEach(function(id) {
+				expect(Number(id)).to.be.a('number');
+			});
+			done();
+		});
+	});
+
+	it('get non-existing elements return empty array', function(done) {
+		driver.getIds({
+			selector: '.non-existing-textfield',
+			strategy: 'css selector'
+		}, function(err, ids) {
+			if (err) return done(err);
+			expect(ids).length(0);
+			done();
+		});
 	});
 
 	it('delete session', function(done) {

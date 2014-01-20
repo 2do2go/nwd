@@ -296,7 +296,7 @@ describe('webdriver', function() {
 	it('wait for url change', function(done) {
 		driver.waitForUrlChange(
 			getFixturePath('github/index.html'),
-			null,
+			'',
 			expectForDriverAndDone(done)
 		);
 	});
@@ -315,7 +315,7 @@ describe('webdriver', function() {
 
 	it('wait for url change', function(done) {
 		driver.waitForUrlChange(
-			getFixturePath('github/terms-of-service.html'),
+			'',
 			getFixturePath('github/index.html'),
 			expectForDriverAndDone(done)
 		);

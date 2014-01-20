@@ -201,11 +201,56 @@ describe('webdriver', function() {
 		});
 	});
 
-	it('get form element', function(done) {
+	it('form element is displayed', function(done) {
 		formElement.isDisplayed(function(err, isDisplayed) {
 			if (err) return done(err);
 			expect(isDisplayed).to.be.a('boolean');
 			expect(isDisplayed).equal(true);
+			done();
+		});
+	});
+
+	var loginElement = null;
+	it('get login element', function(done) {
+		driver.get({
+			selector: '[name="user[login]"]',
+			strategy: 'css selector'
+		}, function(err, element) {
+			if (err) return done(err);
+			expectWebElement(element);
+			loginElement = element;
+			done();
+		});
+	});
+
+	it('get placeholder attribute', function(done) {
+		loginElement.getAttr('placeholder', function(err, placeholder) {
+			if (err) return done(err);
+			expect(placeholder).equal('Pick a username');
+			done();			
+		});
+	});
+
+	it('enter login', function(done) {
+		loginElement.sendKeys('patrik', expectForDriverAndDone(done));
+	});
+
+	it('get entered login', function(done) {
+		loginElement.getValue(function(err, login) {
+			if (err) return done(err);
+			expect(login).equal('patrik');
+			done();
+		});
+	});
+
+	it('clear login field', function(done) {
+		loginElement.clear(expectForDriverAndDone(done));
+	});
+
+	it('get cleared login', function(done) {
+		loginElement.getValue(function(err, login) {
+			if (err) return done(err);
+			expect(login).equal('');
 			done();
 		});
 	});

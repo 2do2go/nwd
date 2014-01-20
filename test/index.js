@@ -278,6 +278,17 @@ describe('webdriver', function() {
 		});
 	});
 
+	it('click on term of service link', function(done) {
+		driver.get({
+			selector: '[href="terms-of-service.html"]',
+			strategy: 'css selector'
+		}, function(err, termsElement) {
+			if (err) return done(err);
+			expectWebElement(termsElement);
+			termsElement.click(expectForDriverAndDone(done));
+		});
+	});
+
 	it('delete session', function(done) {
 		driver.deleteSession(expectForDriverAndDone(done));
 	});

@@ -57,13 +57,13 @@ describe('webdriver', function() {
 	});
 
 	it('navigate to fixture page', function(done) {
-		driver.setUrl(getFixturePath('github.html'), expectForDriverAndDone(done));
+		driver.setUrl(getFixturePath('github/index.html'), expectForDriverAndDone(done));
 	});
 
 	it('return current page url', function(done) {
 		driver.getUrl(function(err, url) {
 			if (err) return done(err);
-			expect(url).equal(getFixturePath('github.html'));
+			expect(url).equal(getFixturePath('github/index.html'));
 			done();
 		});
 	});

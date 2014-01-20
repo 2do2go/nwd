@@ -2,6 +2,7 @@
 
 var expect = require('expect.js'),
 	WebDriver = require('../lib').WebDriver,
+	WebElement = require('../lib').WebElement,
 	errors = require('../lib').errors;
 
 var driverParams = {
@@ -30,6 +31,12 @@ function expectForDriverAndDone(done) {
 	return expectAndDone(function(value) {
 		expect(value).to.be.a(WebDriver);
 	}, done);
+}
+
+function expectWebElement(element) {
+	expect(element).to.be.a(WebElement);
+	expect(Number(element.id)).to.be.a('number');
+	expect(element.driver).to.be.a(WebDriver);
 }
 
 describe('webdriver', function() {
@@ -115,18 +122,18 @@ describe('webdriver', function() {
 	});
 
 	it('get element using css selector', function(done) {
-		driver.getId({
+		driver.get({
 			selector: '[name="user[login]"]',
 			strategy: 'css selector'
-		}, function(err, id) {
+		}, function(err, element) {
 			if (err) return done(err);
-			expect(Number(id)).to.be.a('number');
+			expectWebElement(element);
 			done();
 		});
 	});
 
 	it('get non-existing element return error', function(done) {
-		driver.getId({
+		driver.get({
 			selector: '[name="non-existing"]',
 			strategy: 'css selector'
 		}, function(err, id) {
@@ -136,26 +143,69 @@ describe('webdriver', function() {
 	});
 
 	it('get elements using selector', function(done) {
-		driver.getIds({
+		driver.getList({
 			selector: '.textfield',
 			strategy: 'css selector'
-		}, function(err, ids) {
+		}, function(err, elements) {
 			if (err) return done(err);
-			expect(ids.length).greaterThan(1);
-			ids.forEach(function(id) {
-				expect(Number(id)).to.be.a('number');
-			});
+			expect(elements.length).greaterThan(1);
+			elements.forEach(expectWebElement);
 			done();
 		});
 	});
 
 	it('get non-existing elements return empty array', function(done) {
-		driver.getIds({
+		driver.getList({
 			selector: '.non-existing-textfield',
 			strategy: 'css selector'
-		}, function(err, ids) {
+		}, function(err, elements) {
 			if (err) return done(err);
-			expect(ids).length(0);
+			expect(elements).length(0);
+			done();
+		});
+	});
+
+	var formElement = null;
+	it('get form element', function(done) {
+		driver.get({
+			selector: '.js-form-signup-home',
+			strategy: 'css selector'
+		}, function(err, element) {
+			if (err) return done(err);
+			expectWebElement(element);
+			formElement = element;
+			done();
+		});
+	});
+
+	it('get child element of form', function(done) {
+		formElement.get({
+			selector: '[name="user[login]"]',
+			strategy: 'css selector'
+		}, function(err, element) {
+			if (err) return done(err);
+			expectWebElement(element);
+			done();
+		});
+	});
+
+	it('get children elements of form', function(done) {
+		formElement.getList({
+			selector: '.textfield',
+			strategy: 'css selector'
+		}, function(err, elements) {
+			if (err) return done(err);
+			expect(elements.length).greaterThan(1);
+			elements.forEach(expectWebElement);
+			done();
+		});
+	});
+
+	it('get form element', function(done) {
+		formElement.isDisplayed(function(err, isDisplayed) {
+			if (err) return done(err);
+			expect(isDisplayed).to.be.a('boolean');
+			expect(isDisplayed).equal(true);
 			done();
 		});
 	});

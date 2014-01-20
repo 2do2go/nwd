@@ -126,10 +126,7 @@ describe('webdriver', function() {
 	});
 
 	it('get element using css selector', function(done) {
-		driver.get({
-			selector: '[name="user[login]"]',
-			strategy: 'css selector'
-		}, function(err, element) {
+		driver.get('[name="user[login]"]', function(err, element) {
 			if (err) return done(err);
 			expectWebElement(element);
 			done();
@@ -137,20 +134,14 @@ describe('webdriver', function() {
 	});
 
 	it('get non-existing element return error', function(done) {
-		driver.get({
-			selector: '[name="non-existing"]',
-			strategy: 'css selector'
-		}, function(err, id) {
+		driver.get('[name="non-existing"]', function(err, id) {
 			expect(err).to.be.a(errors.NoSuchElementError);
 			done();
 		});
 	});
 
 	it('get elements using selector', function(done) {
-		driver.getList({
-			selector: '.textfield',
-			strategy: 'css selector'
-		}, function(err, elements) {
+		driver.getList('.textfield', function(err, elements) {
 			if (err) return done(err);
 			expect(elements.length).greaterThan(1);
 			elements.forEach(expectWebElement);
@@ -159,10 +150,7 @@ describe('webdriver', function() {
 	});
 
 	it('get non-existing elements return empty array', function(done) {
-		driver.getList({
-			selector: '.non-existing-textfield',
-			strategy: 'css selector'
-		}, function(err, elements) {
+		driver.getList('.non-existing-textfield', function(err, elements) {
 			if (err) return done(err);
 			expect(elements).length(0);
 			done();
@@ -171,10 +159,7 @@ describe('webdriver', function() {
 
 	var formElement = null;
 	it('get form element', function(done) {
-		driver.get({
-			selector: '.js-form-signup-home',
-			strategy: 'css selector'
-		}, function(err, element) {
+		driver.get('.js-form-signup-home', function(err, element) {
 			if (err) return done(err);
 			expectWebElement(element);
 			formElement = element;
@@ -183,10 +168,7 @@ describe('webdriver', function() {
 	});
 
 	it('get child element of form', function(done) {
-		formElement.get({
-			selector: '[name="user[login]"]',
-			strategy: 'css selector'
-		}, function(err, element) {
+		formElement.get('[name="user[login]"]', function(err, element) {
 			if (err) return done(err);
 			expectWebElement(element);
 			done();
@@ -194,10 +176,7 @@ describe('webdriver', function() {
 	});
 
 	it('get children elements of form', function(done) {
-		formElement.getList({
-			selector: '.textfield',
-			strategy: 'css selector'
-		}, function(err, elements) {
+		formElement.getList('.textfield', function(err, elements) {
 			if (err) return done(err);
 			expect(elements.length).greaterThan(1);
 			elements.forEach(expectWebElement);
@@ -216,10 +195,7 @@ describe('webdriver', function() {
 
 	var loginElement = null;
 	it('get login element', function(done) {
-		driver.get({
-			selector: '[name="user[login]"]',
-			strategy: 'css selector'
-		}, function(err, element) {
+		driver.get('[name="user[login]"]', function(err, element) {
 			if (err) return done(err);
 			expectWebElement(element);
 			loginElement = element;
@@ -231,7 +207,7 @@ describe('webdriver', function() {
 		loginElement.getAttr('placeholder', function(err, placeholder) {
 			if (err) return done(err);
 			expect(placeholder).equal('Pick a username');
-			done();			
+			done();
 		});
 	});
 
@@ -239,7 +215,7 @@ describe('webdriver', function() {
 		loginElement.getTagName(function(err, name) {
 			if (err) return done(err);
 			expect(name).equal('input');
-			done();			
+			done();
 		});
 	});
 
@@ -268,10 +244,7 @@ describe('webdriver', function() {
 	});
 
 	it('get text of heading element', function(done) {
-		driver.get({
-			selector: '.heading',
-			strategy: 'css selector'
-		}, function(err, headingElement) {
+		driver.get('.heading', function(err, headingElement) {
 			if (err) return done(err);
 			expectWebElement(headingElement);
 			headingElement.getText(function(err, text) {
@@ -283,10 +256,7 @@ describe('webdriver', function() {
 	});
 
 	it('click on term of service link', function(done) {
-		driver.get({
-			selector: '[href="terms-of-service.html"]',
-			strategy: 'css selector'
-		}, function(err, termsElement) {
+		driver.get('[href="terms-of-service.html"]', function(err, termsElement) {
 			if (err) return done(err);
 			expectWebElement(termsElement);
 			termsElement.click(expectForDriverAndDone(done));

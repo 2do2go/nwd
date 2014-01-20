@@ -52,6 +52,10 @@ describe('webdriver', function() {
 		driver.deleteCookie(expectForDriverAndDone(done));
 	});
 
+	it('refresh current page', function(done) {
+		driver.refresh(expectForDriverAndDone(done));
+	});
+
 	it('maximize window', function(done) {
 		driver.maximizeWindow(expectForDriverAndDone(done));
 	});
@@ -286,6 +290,42 @@ describe('webdriver', function() {
 			if (err) return done(err);
 			expectWebElement(termsElement);
 			termsElement.click(expectForDriverAndDone(done));
+		});
+	});
+
+	it('wait for url change', function(done) {
+		driver.waitForUrlChange(
+			getFixturePath('github/index.html'),
+			null,
+			expectForDriverAndDone(done)
+		);
+	});
+
+	it('return current page url (terms of service)', function(done) {
+		driver.getUrl(function(err, url) {
+			if (err) return done(err);
+			expect(url).equal(getFixturePath('github/terms-of-service.html'));
+			done();
+		});
+	});
+
+	it('got to back to index page', function(done) {
+		driver.back(expectForDriverAndDone(done));
+	});
+
+	it('wait for url change', function(done) {
+		driver.waitForUrlChange(
+			getFixturePath('github/terms-of-service.html'),
+			getFixturePath('github/index.html'),
+			expectForDriverAndDone(done)
+		);
+	});
+
+	it('return current page url (index page)', function(done) {
+		driver.getUrl(function(err, url) {
+			if (err) return done(err);
+			expect(url).equal(getFixturePath('github/index.html'));
+			done();
 		});
 	});
 

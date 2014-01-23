@@ -279,7 +279,7 @@ describe('webdriver', function() {
 		});
 	});
 
-	it('got to back to index page', function(done) {
+	it('go back to index page', function(done) {
 		driver.back(expectForDriverAndDone(done));
 	});
 

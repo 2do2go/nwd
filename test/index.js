@@ -46,9 +46,10 @@ function elementCommand(id, action, after, callback) {
 		var cmd = null,
 			el = 'var el = document.getElementById("' + id + '");';
 		if (action === 'show') {
-			cmd = el + 'el.style.visibility="visible";';
+			//HARDCODE: display block
+			cmd = el + 'el.style.display="block";';
 		} else if (action === 'hide') {
-			cmd = el + 'el.style.visibility="hidden";';
+			cmd = el + 'el.style.display="none";';
 		} else if (action === 'remove') {
 			cmd = el + 'el.parentNode.removeChild(el);';
 		} else {
@@ -304,7 +305,7 @@ describe('webdriver', function() {
 	});
 
 	it('search input element is visible', function(done) {
-		searchFormElement.isVisible(function(err, isVisible) {
+		searchInputElement.isVisible(function(err, isVisible) {
 			if (err) return done(err);
 			expect(isVisible).equal(true);
 			done();
@@ -322,7 +323,7 @@ describe('webdriver', function() {
 	});
 
 	it('search input element is not visible', function(done) {
-		searchFormElement.isVisible(function(err, isVisible) {
+		searchInputElement.isVisible(function(err, isVisible) {
 			if (err) return done(err);
 			expect(isVisible).equal(false);
 			done();

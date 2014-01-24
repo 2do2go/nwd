@@ -344,6 +344,17 @@ describe('webdriver', function() {
 		elementCommand('top_search_form', 'remove', 100);
 	});
 
+	it('wait for new element', function(done) {
+		driver.waitForElement('#new-element', expectForDriverAndDone(done));
+		setTimeout(function() {
+			driver.execute(function() {
+				var el = document.createElement('div');
+				el.setAttribute('id', 'new-element');
+				document.body.appendChild(el);
+			}, [], false, function() {});
+		}, 100);
+	});
+
 	it('get text of heading element', function(done) {
 		driver.get('.heading', function(err, headingElement) {
 			if (err) return done(err);

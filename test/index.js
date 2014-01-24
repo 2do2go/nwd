@@ -39,9 +39,33 @@ function expectWebElement(element) {
 	expect(element.driver).to.be.a(WebDriver);
 }
 
+var driver = null;
+
+function elementCommand(id, action, after, callback) {
+	setTimeout(function() {
+		var cmd = null,
+			el = 'var el = document.getElementById("' + id + '");';
+		if (action === 'show') {
+			cmd = el + 'el.style.visibility="visible";';
+		} else if (action === 'hide') {
+			cmd = el + 'el.style.visibility="hidden";';
+		} else if (action === 'remove') {
+			cmd = el + 'el.parentNode.removeChild(el);';
+		} else {
+			callback(new Error('Unknown action: ' + action));
+		}
+		driver.execute(cmd, [], false, callback || function() {});
+	}, after || 0);		
+}
+
+function itElementCommand(id, action, after) {
+	it(action +' ' + id, function(done) {
+		elementCommand(id, action, after, done);
+	});
+}
+
 describe('webdriver', function() {
 	this.timeout(10000);
-	var driver = null;
 
 	it('init without errors', function(done) {
 		driver = new WebDriver(driverParams);
@@ -241,6 +265,82 @@ describe('webdriver', function() {
 			expect(login).equal('');
 			done();
 		});
+	});
+
+	var searchFormElement = null;
+	it('get search form element', function(done) {
+		driver.get('#top_search_form', function(err, element) {
+			if (err) return done(err);
+			expectWebElement(element);
+			searchFormElement = element;
+			done();
+		});
+	});
+
+	var searchInputElement = null;
+	it('get search input element', function(done) {
+		driver.get('#js-command-bar-field', function(err, element) {
+			if (err) return done(err);
+			expectWebElement(element);
+			searchInputElement = element;
+			done();
+		});
+	});
+
+	it('get search form visibility', function(done) {
+		searchFormElement.getCssProp('visibility', function(err, visibility) {
+			if (err) return callback(err);
+			expect(visibility).equal('visible');
+			done();
+		});
+	});
+
+	it('search form element is visible', function(done) {
+		searchFormElement.isVisible(function(err, isVisible) {
+			if (err) return done(err);
+			expect(isVisible).equal(true);
+			done();
+		});
+	});
+
+	it('search input element is visible', function(done) {
+		searchFormElement.isVisible(function(err, isVisible) {
+			if (err) return done(err);
+			expect(isVisible).equal(true);
+			done();
+		});
+	});
+
+	itElementCommand('top_search_form', 'hide');
+
+	it('search form element is not visible', function(done) {
+		searchFormElement.isVisible(function(err, isVisible) {
+			if (err) return done(err);
+			expect(isVisible).equal(false);
+			done();
+		});
+	});
+
+	it('search input element is not visible', function(done) {
+		searchFormElement.isVisible(function(err, isVisible) {
+			if (err) return done(err);
+			expect(isVisible).equal(false);
+			done();
+		});
+	});
+
+	itElementCommand('top_search_form', 'show');
+
+	it('wait for search for disappear (hide element)', function(done) {
+		searchFormElement.waitForDisappear(expectForDriverAndDone(done));
+		elementCommand('top_search_form', 'hide', 100);
+	});
+
+	itElementCommand('top_search_form', 'show');
+
+	it('wait for search for disappear (remove element)', function(done) {
+		searchFormElement.waitForDisappear(expectForDriverAndDone(done));
+		elementCommand('top_search_form', 'remove', 100);
 	});
 
 	it('get text of heading element', function(done) {

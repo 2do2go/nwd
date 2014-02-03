@@ -168,6 +168,26 @@ describe('webdriver', function() {
 		});
 	});
 
+	it('get same for using jquery methods chaining', function(done) {
+		driver.get('#js-command-bar-field', {using: 'jquery', chain: [
+			{next: ''},
+			{closest: 'form'}
+		]}, function(err, element) {
+			if (err) return done(err);
+			expectWebElement(element);
+			jqueryFirstForm = element;
+			done();
+		});
+	});
+
+	it('check form by id', function(done) {
+		jqueryFirstForm.getAttr('id', function(err, value) {
+			if (err) return done(err);
+			expect(value).equal('top_search_form');
+			done();
+		});
+	});
+
 	it('get element using css selector', function(done) {
 		driver.get('[name="user[login]"]', function(err, element) {
 			if (err) return done(err);

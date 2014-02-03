@@ -150,6 +150,24 @@ describe('webdriver', function() {
 		);
 	});
 
+	var jqueryFirstForm = null;
+	it('get first form using jquery', function(done) {
+		driver.get('form:first', {using: 'jquery'}, function(err, element) {
+			if (err) return done(err);
+			expectWebElement(element);
+			jqueryFirstForm = element;
+			done();
+		});
+	});
+
+	it('first form is search form (identified by id)', function(done) {
+		jqueryFirstForm.getAttr('id', function(err, value) {
+			if (err) return done(err);
+			expect(value).equal('top_search_form');
+			done();
+		});
+	});
+
 	it('get element using css selector', function(done) {
 		driver.get('[name="user[login]"]', function(err, element) {
 			if (err) return done(err);

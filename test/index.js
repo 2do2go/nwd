@@ -150,6 +150,10 @@ describe('webdriver', function() {
 		);
 	});
 
+	it('wait for document ready (jquery)', function(done) {
+		driver.waitForDocumentReady(expectForDriverAndDone(done));
+	});
+
 	var jqueryFirstForm = null;
 	it('get first form using jquery', function(done) {
 		driver.get('form:first', {using: 'jquery'}, function(err, element) {

@@ -33,6 +33,12 @@ function expectForDriverAndDone(done) {
 	}, done);
 }
 
+function expectForElementAndDone(element, done) {
+	return expectAndDone(function(value) {
+		expect(value).equal(element);
+	}, done);
+}
+
 function expectWebElement(element) {
 	expect(element).to.be.a(WebElement);
 	expect(Number(element.id)).to.be.a('number');
@@ -317,7 +323,7 @@ describe('webdriver', function() {
 	});
 
 	it('enter login', function(done) {
-		loginElement.sendKeys('patrik', expectForDriverAndDone(done));
+		loginElement.sendKeys('patrik', expectForElementAndDone(loginElement, done));
 	});
 
 	it('get entered login', function(done) {
@@ -329,7 +335,7 @@ describe('webdriver', function() {
 	});
 
 	it('clear login field', function(done) {
-		loginElement.clear(expectForDriverAndDone(done));
+		loginElement.clear(expectForElementAndDone(loginElement, done));
 	});
 
 	it('get cleared login', function(done) {
@@ -443,7 +449,7 @@ describe('webdriver', function() {
 		driver.get('[href="terms-of-service.html"]', function(err, termsElement) {
 			if (err) return done(err);
 			expectWebElement(termsElement);
-			termsElement.click(expectForDriverAndDone(done));
+			termsElement.click(expectForElementAndDone(termsElement, done));
 		});
 	});
 

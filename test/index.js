@@ -180,6 +180,21 @@ describe('webdriver', function() {
 		});
 	});
 
+	it(
+		'return null and no error when get non-existing element using ' +
+		'custom strategy with noError: true',
+		function(done) {
+			driver.get('[name="non-existing"]', {
+				using: 'jquery',
+				noError: true
+			}, function(err, element) {
+				expect(err).not.to.be.ok(err);
+				expect(element).to.be(null);
+				done();
+			});
+		}
+	);
+
 	it('check form by id', function(done) {
 		jqueryFirstForm.getAttr('id', function(err, value) {
 			if (err) return done(err);
@@ -197,11 +212,26 @@ describe('webdriver', function() {
 	});
 
 	it('get non-existing element return error', function(done) {
-		driver.get('[name="non-existing"]', function(err, id) {
+		driver.get('[name="non-existing"]', function(err) {
 			expect(err).to.be.a(errors.NoSuchElementError);
 			done();
 		});
 	});
+
+	it(
+		'return null and no error when get non-existing element using ' +
+		'built-in strategy with noError: true',
+		function(done) {
+			driver.get('[name="non-existing"]', {
+				using: 'css selector',
+				noError: true
+			}, function(err, element) {
+				expect(err).not.to.be.ok(err);
+				expect(element).to.be(null);
+				done();
+			});
+		}
+	);
 
 	it('get elements using selector', function(done) {
 		driver.getList('.textfield', function(err, elements) {

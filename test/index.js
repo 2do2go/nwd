@@ -453,41 +453,89 @@ describe('webdriver', function() {
 		});
 	});
 
-	it('wait for url change', function(done) {
-		driver.waitForUrlChange(
-			getFixturePath('github/index.html'),
-			'',
-			expectForDriverAndDone(done)
-		);
-	});
-
-	it('return current page url (terms of service)', function(done) {
-		driver.getUrl(function(err, url) {
-			if (err) return done(err);
-			expect(url).equal(getFixturePath('github/terms-of-service.html'));
-			done();
+	function waitForUrlChangeFromIndexOnTermsOfService() {
+		it('wait for url change (on terms of service page url)', function(done) {
+			driver.waitForUrlChange(
+				getFixturePath('github/index.html'),
+				getFixturePath('github/terms-of-service.html'),
+				expectForDriverAndDone(done)
+			);
 		});
-	});
+	}
 
-	it('go back to index page', function(done) {
-		driver.back(expectForDriverAndDone(done));
-	});
+	waitForUrlChangeFromIndexOnTermsOfService();
 
-	it('wait for url change', function(done) {
-		driver.waitForUrlChange(
-			'',
-			getFixturePath('github/index.html'),
-			expectForDriverAndDone(done)
-		);
-	});
-
-	it('return current page url (index page)', function(done) {
-		driver.getUrl(function(err, url) {
-			if (err) return done(err);
-			expect(url).equal(getFixturePath('github/index.html'));
-			done();
+	function goBack() {
+		it('go back', function(done) {
+			driver.back(expectForDriverAndDone(done));
 		});
+	}
+
+	goBack();
+
+	function waitForUrlChangeFromTermsOfServiceOnIndex() {
+		it('wait for url change (on index page url)', function(done) {
+			driver.waitForUrlChange(
+				getFixturePath('github/terms-of-service.html'),
+				getFixturePath('github/index.html'),
+				expectForDriverAndDone(done)
+			);
+		});
+	}
+
+	waitForUrlChangeFromTermsOfServiceOnIndex();
+
+	var termsElement = null;
+	function getTermsElement() {
+		it('get term of service link element', function(done) {
+			driver.get('[href="terms-of-service.html"]', function(err, element) {
+				if (err) return done(err);
+				expectWebElement(element);
+				termsElement = element;
+				done();
+			});
+		});
+	}
+
+
+	getTermsElement();
+
+	it('move mouse cursor to it', function(done) {
+		termsElement.moveTo(expectForElementAndDone(termsElement, done));
 	});
+	it('press down left mouse button (via driver)', function(done) {
+		driver.mouseDown(expectForDriverAndDone(done));
+	});
+	it('releases left mouse button (via driver)', function(done) {
+		driver.mouseUp(expectForDriverAndDone(done));
+	});
+	waitForUrlChangeFromIndexOnTermsOfService();
+	goBack();
+	waitForUrlChangeFromTermsOfServiceOnIndex();
+
+	
+	getTermsElement();
+	it('press down left mouse button on it', function(done) {
+		termsElement.mouseDown(expectForElementAndDone(termsElement, done));
+	});
+	it('releases left mouse button on it', function(done) {
+		termsElement.mouseUp(expectForElementAndDone(termsElement, done));
+	});
+	waitForUrlChangeFromIndexOnTermsOfService();
+	goBack();
+	waitForUrlChangeFromTermsOfServiceOnIndex();
+
+
+	getTermsElement();
+	it('move mouse cursor to it', function(done) {
+		termsElement.moveTo(expectForElementAndDone(termsElement, done));
+	});
+	it('click on it via driver', function(done) {
+		driver.click(expectForDriverAndDone(done));
+	});
+	waitForUrlChangeFromIndexOnTermsOfService();
+	goBack();
+	waitForUrlChangeFromTermsOfServiceOnIndex();
 
 	it('delete session', function(done) {
 		driver.deleteSession(expectForDriverAndDone(done));

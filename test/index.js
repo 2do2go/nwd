@@ -116,11 +116,8 @@ describe('webdriver', function() {
 	});
 
 	it('get timeout', function(done) {
-		driver.getTimeout('script', function(err, timeout) {
-			if (err) return done(err);
-			expect(timeout).equal(500);
-			done();
-		});
+		expect(driver.getTimeout('script')).equal(500);
+		done();
 	});
 
 	it('execute sync js on page', function(done) {

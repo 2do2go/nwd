@@ -111,13 +111,23 @@ describe('webdriver', function() {
 		});
 	});
 
-	it('set timeout', function(done) {
+	var defaultScriptTimeout = null;
+	it('get default script timeout', function(done) {
+		defaultScriptTimeout = driver.getTimeout('script');
+		done();
+	});
+
+	it('set custom script timeout', function(done) {
 		driver.setTimeout('script', 500, done);
 	});
 
-	it('get timeout', function(done) {
+	it('get custom script timeout', function(done) {
 		expect(driver.getTimeout('script')).equal(500);
 		done();
+	});
+
+	it('set default script timeout', function(done) {
+		driver.setTimeout('script', defaultScriptTimeout, done);
 	});
 
 	it('execute sync js on page', function(done) {

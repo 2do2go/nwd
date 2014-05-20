@@ -3,7 +3,9 @@
 var expect = require('expect.js'),
 	WebDriver = require('../lib').WebDriver,
 	WebElement = require('../lib').WebElement,
-	errors = require('../lib').errors;
+	errors = require('../lib').errors,
+	path = require('path'),
+	fs = require('fs');
 
 var driverParams = {
 	host: '127.0.0.1',
@@ -62,7 +64,7 @@ function elementCommand(id, action, after, callback) {
 			callback(new Error('Unknown action: ' + action));
 		}
 		driver.execute(cmd, [], false, callback || function() {});
-	}, after || 0);		
+	}, after || 0);
 }
 
 function itElementCommand(id, action, after) {
@@ -520,7 +522,7 @@ describe('webdriver', function() {
 	goBack();
 	waitForUrlChangeFromTermsOfServiceOnIndex();
 
-	
+
 	getTermsElement();
 	it('press down left mouse button on it', function(done) {
 		termsElement.mouseDown(expectForElementAndDone(termsElement, done));
@@ -543,6 +545,17 @@ describe('webdriver', function() {
 	waitForUrlChangeFromIndexOnTermsOfService();
 	goBack();
 	waitForUrlChangeFromTermsOfServiceOnIndex();
+
+	it('make screenshot', function(done) {
+		//TODO: replace /tmp on os.tmpdir() after node update
+		var tmpFile = path.join('/tmp', 'nwd_screenshot_' + Date.now() + '.png');
+		driver.makeScreenshot(tmpFile, function(err) {
+			if (err) return done(err);
+			fs.exists(tmpFile, function(isExists) {
+				if (isExists) fs.unlink(tmpFile, done);
+			});
+		});
+	});
 
 	it('delete session', function(done) {
 		driver.deleteSession(expectForDriverAndDone(done));

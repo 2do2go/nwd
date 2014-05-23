@@ -222,50 +222,55 @@ describe('webdriver', function() {
 		});
 	});
 
-	it('get element using css selector', function(done) {
-		driver.get('[name="user[login]"]', function(err, element) {
-			if (err) return done(err);
-			expectWebElement(element);
-			done();
-		});
-	});
-
-	it('get non-existing element return error', function(done) {
-		driver.get('[name="non-existing"]', function(err) {
-			expect(err).to.be.a(errors.NoSuchElementError);
-			done();
-		});
-	});
-
-	it(
-		'return null and no error when get non-existing element using ' +
-		'built-in strategy with noError: true',
-		function(done) {
-			driver.get('[name="non-existing"]', {
-				using: 'css selector',
-				noError: true
-			}, function(err, element) {
-				expect(err).not.to.be.ok(err);
-				expect(element).to.be(null);
+	['css selector', 'jquery'].forEach(function(using) {
+		var params = {using: using};
+		it('get element using ' + using, function(done) {
+			driver.get('[name="user[login]"]', params, function(err, element) {
+				if (err) return done(err);
+				expectWebElement(element);
 				done();
 			});
-		}
-	);
-
-	it('get elements using selector', function(done) {
-		driver.getList('.textfield', function(err, elements) {
-			if (err) return done(err);
-			expect(elements.length).greaterThan(1);
-			elements.forEach(expectWebElement);
-			done();
 		});
-	});
 
-	it('get non-existing elements return empty array', function(done) {
-		driver.getList('.non-existing-textfield', function(err, elements) {
-			if (err) return done(err);
-			expect(elements).length(0);
-			done();
+		it('get non-existing element return error', function(done) {
+			driver.get('[name="non-existing"]', params, function(err) {
+				expect(err).to.be.a(errors.NoSuchElementError);
+				done();
+			});
+		});
+
+		it(
+			'return null and no error when get non-existing element using ' +
+			using + ' with noError: true',
+			function(done) {
+				driver.get('[name="non-existing"]', {
+					using: using,
+					noError: true
+				}, function(err, element) {
+					expect(err).not.to.be.ok(err);
+					expect(element).to.be(null);
+					done();
+				});
+			}
+		);
+
+		it('get elements using ' + using, function(done) {
+			driver.getList('.textfield', params, function(err, elements) {
+				if (err) return done(err);
+				expect(elements.length).greaterThan(1);
+				elements.forEach(expectWebElement);
+				done();
+			});
+		});
+
+		it('get non-existing elements using ' + using +
+			' return empty array',
+			function(done) {
+			driver.getList('.textfield12345', params, function(err, elements) {
+				if (err) return done(err);
+				expect(elements).length(0);
+				done();
+			});
 		});
 	});
 
@@ -279,21 +284,42 @@ describe('webdriver', function() {
 		});
 	});
 
-	it('get child element of form', function(done) {
-		formElement.get('[name="user[login]"]', function(err, element) {
-			if (err) return done(err);
-			expectWebElement(element);
-			done();
+	['css selector', 'jquery'].forEach(function(using) {
+		var params = {using: using};
+		it('get child element of form using ' + using, function(done) {
+			formElement.get(
+				'[name="user[login]"]',
+				params,
+				function(err, element) {
+					if (err) return done(err);
+					expectWebElement(element);
+					done();
+				}
+			);
 		});
-	});
 
-	it('get children elements of form', function(done) {
-		formElement.getList('.textfield', function(err, elements) {
-			if (err) return done(err);
-			expect(elements.length).greaterThan(1);
-			elements.forEach(expectWebElement);
-			done();
+		it('get children elements of form using ' + using, function(done) {
+			formElement.getList('.textfield', params, function(err, elements) {
+				if (err) return done(err);
+				expect(elements.length).greaterThan(1);
+				elements.forEach(expectWebElement);
+				done();
+			});
 		});
+
+		it('get non-existing children elements using ' + using +
+			' of form return empty array',
+			function(done) {
+				formElement.getList(
+					'.textfield12345',
+					params,
+					function(err, elements) {
+						if (err) return done(err);
+						expect(elements).length(0);
+						done();
+					}
+				);
+			});
 	});
 
 	it('form element is displayed', function(done) {

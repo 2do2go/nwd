@@ -60,6 +60,10 @@ function elementCommand(id, action, after, callback) {
 			cmd = el + 'el.style.display="none";';
 		} else if (action === 'remove') {
 			cmd = el + 'el.parentNode.removeChild(el);';
+		} else if (action === 'disable') {
+			cmd = el + 'el.disabled=true;';
+		} else if (action === 'enable') {
+			cmd = el + 'el.disabled=false;';
 		} else {
 			callback(new Error('Unknown action: ' + action));
 		}
@@ -400,6 +404,27 @@ describe('webdriver', function() {
 			done();
 		});
 	});
+
+	function itSearchInputElementEnabled(enabled) {
+		it('search input element is ' + enabled ? 'enabled' : 'disabled', function(done) {
+			searchInputElement.isEnabled(function(err, isEnabled) {
+				if (err) return done(err);
+				expect(isEnabled).to.be.a('boolean');
+				expect(isEnabled).equal(enabled);
+				done();
+			});
+		});		
+	}
+
+	itSearchInputElementEnabled(true);
+
+	itElementCommand('js-command-bar-field', 'disable');
+
+	itSearchInputElementEnabled(false);
+
+	itElementCommand('js-command-bar-field', 'enable');
+
+	itSearchInputElementEnabled(true);
 
 	it('get search form visibility', function(done) {
 		searchFormElement.getCssProp('visibility', function(err, visibility) {

@@ -303,9 +303,9 @@ describe('webdriver', function() {
 		});
 
 		it('get children elements of form using ' + using, function(done) {
-			formElement.getList('.textfield', params, function(err, elements) {
+			formElement.getList('input[type=text]', params, function(err, elements) {
 				if (err) return done(err);
-				expect(elements.length).greaterThan(1);
+				expect(elements.length).equal(2);
 				elements.forEach(expectWebElement);
 				done();
 			});

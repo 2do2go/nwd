@@ -545,6 +545,16 @@ describe('webdriver', function() {
 
 	waitForUrlChangeFromTermsOfServiceOnIndex();
 
+	it('go forward', function(done) {
+		driver.forward(expectForDriverAndDone(done));
+	});
+
+	waitForUrlChangeFromIndexOnTermsOfService();
+
+	goBack();
+
+	waitForUrlChangeFromTermsOfServiceOnIndex();
+
 	var termsElement = null;
 	function getTermsElement() {
 		it('get term of service link element', function(done) {

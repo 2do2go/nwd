@@ -89,10 +89,6 @@ describe('webdriver', function() {
 		driver.deleteCookie(expectForDriverAndDone(done));
 	});
 
-	it('refresh current page', function(done) {
-		driver.refresh(expectForDriverAndDone(done));
-	});
-
 	it('maximize window', function(done) {
 		driver.maximizeWindow(expectForDriverAndDone(done));
 	});
@@ -395,8 +391,43 @@ describe('webdriver', function() {
 		});
 	});
 
+	it('wait for form element state change (should be error, ' +
+		'coz state is not saved)', function(done) {
+		searchFormElement.waitForStateChange(function(err) {
+			expect(err).to.be.a(errors.NoCurrentStateError);
+			done();
+		});
+	});
+
+	it('save search form element state', function(done) {
+		searchFormElement.saveState(
+			expectForElementAndDone(searchFormElement, done)
+		);
+	});
+
+	itElementCommand('js-command-bar-field', 'remove');
+
+	it('wait for search form element state change', function(done) {
+		searchFormElement.waitForStateChange(
+			expectForElementAndDone(searchFormElement, done)
+		);
+	});
+
+	it('refresh current page', function(done) {
+		driver.refresh(expectForDriverAndDone(done));
+	});
+
+	it('get search form element again (after page refresh)', function(done) {
+		driver.get('#top_search_form', function(err, element) {
+			if (err) return done(err);
+			expectWebElement(element);
+			searchFormElement = element;
+			done();
+		});
+	});
+
 	var searchInputElement = null;
-	it('get search input element', function(done) {
+	it('get search input element (should exist after page refresh)', function(done) {
 		driver.get('#js-command-bar-field', function(err, element) {
 			if (err) return done(err);
 			expectWebElement(element);

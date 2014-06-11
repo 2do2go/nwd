@@ -16,7 +16,11 @@
 	"dependencies": {},
 	"devDependencies": {
 		"mocha": "1.11.0",
-		"expect.js": "0.2.0"
+		"expect.js": "0.2.0",
+		"jsdoc": "3.2.2"
+	},
+	"scripts": {
+		"mkdoc": "jsdoc lib docs/README.md -d docs/built"
 	},
 	"main": "./lib/index"
 }

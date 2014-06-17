@@ -391,20 +391,6 @@ describe('webdriver', function() {
 		});
 	});
 
-	it('wait for form element state change (should be error, ' +
-		'coz state is not saved)', function(done) {
-		searchFormElement.waitForStateChange(function(err) {
-			expect(err).to.be.a(errors.NoCurrentStateError);
-			done();
-		});
-	});
-
-	it('save search form element state', function(done) {
-		searchFormElement.saveState(
-			expectForElementAndDone(searchFormElement, done)
-		);
-	});
-
 	var searchInputElement = null;
 	it('get search input element', function(done) {
 		driver.get('#js-command-bar-field', function(err, element) {
@@ -421,12 +407,6 @@ describe('webdriver', function() {
 			done();
 		});
 		elementCommand('js-command-bar-field', 'remove', 50);
-	});
-
-	it('wait for search form element state change', function(done) {
-		searchFormElement.waitForStateChange(
-			expectForElementAndDone(searchFormElement, done)
-		);
 	});
 
 	it('refresh current page', function(done) {

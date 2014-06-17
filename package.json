@@ -12,7 +12,7 @@
 	],
 	"scripts": {
 		"test": "mocha test --reporter spec --bail --async-only",
-		"mkdoc": "jsdoc lib docs/README.md -d docs/built"
+		"doc": "jsdoc lib docs/README.md -d docs/built"
 	},
 	"dependencies": {},
 	"devDependencies": {

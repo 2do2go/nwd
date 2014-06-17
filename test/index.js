@@ -405,7 +405,23 @@ describe('webdriver', function() {
 		);
 	});
 
-	itElementCommand('js-command-bar-field', 'remove');
+	var searchInputElement = null;
+	it('get search input element', function(done) {
+		driver.get('#js-command-bar-field', function(err, element) {
+			if (err) return done(err);
+			expectWebElement(element);
+			searchInputElement = element;
+			done();
+		});
+	});
+
+	it('wait for search input detach (remove element after 50 ms)', function(done) {
+		searchInputElement.waitForDetach(function(err) {
+			if (err) return done(err);
+			done();
+		});
+		elementCommand('js-command-bar-field', 'remove', 50);
+	});
 
 	it('wait for search form element state change', function(done) {
 		searchFormElement.waitForStateChange(
@@ -426,7 +442,6 @@ describe('webdriver', function() {
 		});
 	});
 
-	var searchInputElement = null;
 	it('get search input element (should exist after page refresh)', function(done) {
 		driver.get('#js-command-bar-field', function(err, element) {
 			if (err) return done(err);

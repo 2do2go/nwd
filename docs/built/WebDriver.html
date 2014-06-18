@@ -411,7 +411,7 @@ parameters (e.g. params.defaults.using will be used by `get`, `getList`,
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line691">line 691</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line693">line 693</a>
     </li></ul></dd>
     
     
@@ -574,7 +574,7 @@ behaviour).
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line760">line 760</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line762">line 762</a>
     </li></ul></dd>
     
     
@@ -734,7 +734,7 @@ behaviour).
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line648">line 648</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line650">line 650</a>
     </li></ul></dd>
     
     
@@ -1155,7 +1155,7 @@ the currently selected frame.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line699">line 699</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line701">line 701</a>
     </li></ul></dd>
     
     
@@ -2299,7 +2299,7 @@ Empty array will be returned if no such elements on the page.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line664">line 664</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line666">line 666</a>
     </li></ul></dd>
     
     
@@ -2416,7 +2416,7 @@ Empty array will be returned if no such elements on the page.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line680">line 680</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line682">line 682</a>
     </li></ul></dd>
     
     
@@ -2579,7 +2579,7 @@ call to buttondown) will yield undefined behaviour.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line725">line 725</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line727">line 727</a>
     </li></ul></dd>
     
     
@@ -2741,7 +2741,7 @@ click and buttondown about implications of out-of-order commands.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line742">line 742</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line744">line 744</a>
     </li></ul></dd>
     
     
@@ -2858,7 +2858,7 @@ click and buttondown about implications of out-of-order commands.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line707">line 707</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line709">line 709</a>
     </li></ul></dd>
     
     
@@ -3341,6 +3341,7 @@ click and buttondown about implications of out-of-order commands.
 `params.timeout` (if not set `this.timeouts.waitFor` will be used) expired
 (in this case error with `params.errorMessage` will be passed to callback,
 if `params.noError` is not true).
+Note: co version of the driver has similar method - `yieldUntil`.
     </div>
     
 
@@ -3373,7 +3374,7 @@ if `params.noError` is not true).
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line603">line 603</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line605">line 605</a>
     </li></ul></dd>
     
     
@@ -3490,7 +3491,7 @@ if `params.noError` is not true).
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line549">line 549</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line550">line 550</a>
     </li></ul></dd>
     
     
@@ -3518,7 +3519,7 @@ if `params.noError` is not true).
         
             
 <dt>
-    <h4 class="name" id="waitForElement"><span class="type-signature"></span>waitForElement<span class="signature">(callback(err:Error,element:WebElement))</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="waitForElement"><span class="type-signature"></span>waitForElement<span class="signature">(selector, <span class="optional">params</span>, callback(err:Error,element:WebElement))</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -3526,9 +3527,8 @@ if `params.noError` is not true).
     
     
     <div class="description">
-        Wait for element appear on current page and return it
+        Wait for element appear on current page and return it.
 `selector` and `params` could accept same values as at `get`.
-Note: co version of the driver has similar method - `yieldUntil`.
     </div>
     
 
@@ -3550,6 +3550,8 @@ Note: co version of the driver has similar method - `yieldUntil`.
 		<th>Type</th>
 		
 		
+		<th>Argument</th>
+		
 		
 		
 		
@@ -3558,6 +3560,70 @@ Note: co version of the driver has similar method - `yieldUntil`.
 	</thead>
 	
 	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>selector</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
 	
 	
         <tr>
@@ -3574,6 +3640,14 @@ Note: co version of the driver has similar method - `yieldUntil`.
             
             </td>
             
+            
+                <td class="attributes">
+                
+                    
+                
+                    
+                
+                </td>
             
             
             
@@ -3609,7 +3683,7 @@ Note: co version of the driver has similar method - `yieldUntil`.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line457">line 457</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line458">line 458</a>
     </li></ul></dd>
     
     
@@ -3727,7 +3801,7 @@ Note: co version of the driver has similar method - `yieldUntil`.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line491">line 491</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line492">line 492</a>
     </li></ul></dd>
     
     
@@ -3871,7 +3945,7 @@ Query string is not involved in url comparation.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line541">line 541</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line542">line 542</a>
     </li></ul></dd>
     
     
@@ -4041,7 +4115,7 @@ Query string is not involved in url comparation.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line509">line 509</a>
+        <a href="webDriver.js.html">webDriver.js</a>, <a href="webDriver.js.html#line510">line 510</a>
     </li></ul></dd>
     
     
@@ -4088,7 +4162,7 @@ Query string is not involved in url comparation.
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Jun 17 2014 17:56:22 GMT+0400 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Wed Jun 18 2014 17:49:03 GMT+0400 (MSK)
 </footer>
 
 <script> prettyPrint(); </script>

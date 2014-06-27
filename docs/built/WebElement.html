@@ -521,7 +521,7 @@ This command is reserved for future use; its return type is currently undefined.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line229">line 229</a>
+        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line238">line 238</a>
     </li></ul></dd>
     
     
@@ -713,7 +713,7 @@ This command is reserved for future use; its return type is currently undefined.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line181">line 181</a>
+        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line183">line 183</a>
     </li></ul></dd>
     
     
@@ -994,7 +994,7 @@ name (e.g. background-color instead of backgroundColor).</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line242">line 242</a>
+        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line251">line 251</a>
     </li></ul></dd>
     
     
@@ -1186,7 +1186,7 @@ name (e.g. background-color instead of backgroundColor).</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line195">line 195</a>
+        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line197">line 197</a>
     </li></ul></dd>
     
     
@@ -1565,6 +1565,124 @@ name (e.g. background-color instead of backgroundColor).</td>
         
             
 <dt>
+    <h4 class="name" id="isDisabled"><span class="type-signature"></span>isDisabled<span class="signature">(callback(err:Error,disabled:Boolean))</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Determine if an element is currently disabled using DOM Element 'disabled'
+property (works properly for any native controls).
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>callback(err:Error,disabled:Boolean)</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line224">line 224</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="isDisplayed"><span class="type-signature"></span>isDisplayed<span class="signature">(callback(err:Error,displayed:Boolean))</span><span class="type-signature"></span></h4>
     
     
@@ -1574,6 +1692,8 @@ name (e.g. background-color instead of backgroundColor).</td>
     
     <div class="description">
         Determine if an element is currently displayed.
+This method avoids the problem of having to parse an element's 'style'
+attribute.
     </div>
     
 
@@ -1654,7 +1774,7 @@ name (e.g. background-color instead of backgroundColor).</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line206">line 206</a>
+        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line264">line 264</a>
     </li></ul></dd>
     
     
@@ -1691,6 +1811,10 @@ name (e.g. background-color instead of backgroundColor).</td>
     
     <div class="description">
         Determine if an element is currently enabled.
+This will generally return true for everything but disabled input elements.
+NOTE: therefore that native selenium function works properly only for
+inputs. See <a href="WebElement.html#isDisabled">WebElement#isDisabled</a> method which works properly for
+all native controls.
     </div>
     
 
@@ -1771,124 +1895,7 @@ name (e.g. background-color instead of backgroundColor).</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line217">line 217</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="isVisible"><span class="type-signature"></span>isVisible<span class="signature">(callback(err:Error,visible:Boolean))</span><span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Determine if an element is currently visible.
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>callback(err:Error,visible:Boolean)</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line264">line 264</a>
+        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line212">line 212</a>
     </li></ul></dd>
     
     
@@ -2210,7 +2217,7 @@ name (e.g. background-color instead of backgroundColor).</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line165">line 165</a>
+        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line166">line 166</a>
     </li></ul></dd>
     
     
@@ -2610,7 +2617,7 @@ to the center of the element.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line313">line 313</a>
+        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line334">line 334</a>
     </li></ul></dd>
     
     
@@ -2727,7 +2734,7 @@ to the center of the element.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line290">line 290</a>
+        <a href="webElement.js.html">webElement.js</a>, <a href="webElement.js.html#line311">line 311</a>
     </li></ul></dd>
     
     
@@ -2774,7 +2781,7 @@ to the center of the element.</td>
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Wed Jun 18 2014 17:49:03 GMT+0400 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Fri Jun 27 2014 17:13:06 GMT+0400 (MSK)
 </footer>
 
 <script> prettyPrint(); </script>

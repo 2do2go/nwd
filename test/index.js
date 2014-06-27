@@ -322,15 +322,6 @@ describe('webdriver', function() {
 			});
 	});
 
-	it('form element is displayed', function(done) {
-		formElement.isDisplayed(function(err, isDisplayed) {
-			if (err) return done(err);
-			expect(isDisplayed).to.be.a('boolean');
-			expect(isDisplayed).equal(true);
-			done();
-		});
-	});
-
 	var loginElement = null;
 	it('get login element', function(done) {
 		driver.get('[name="user[login]"]', function(err, element) {
@@ -475,11 +466,25 @@ describe('webdriver', function() {
 			done();
 		});
 	});
+	it('and displayed', function(done) {
+		searchFormElement.isDisplayed(function(err, isDisplayed) {
+			if (err) return done(err);
+			expect(isDisplayed).equal(true);
+			done();
+		});
+	});
 
 	it('search input element is visible', function(done) {
 		searchInputElement.isVisible(function(err, isVisible) {
 			if (err) return done(err);
 			expect(isVisible).equal(true);
+			done();
+		});
+	});
+	it('and displayed', function(done) {
+		searchInputElement.isDisplayed(function(err, isDisplayed) {
+			if (err) return done(err);
+			expect(isDisplayed).equal(true);
 			done();
 		});
 	});
@@ -493,11 +498,25 @@ describe('webdriver', function() {
 			done();
 		});
 	});
+	it('and not displayed', function(done) {
+		searchFormElement.isDisplayed(function(err, isDisplayed) {
+			if (err) return done(err);
+			expect(isDisplayed).equal(false);
+			done();
+		});
+	});
 
 	it('search input element is not visible', function(done) {
 		searchInputElement.isVisible(function(err, isVisible) {
 			if (err) return done(err);
 			expect(isVisible).equal(false);
+			done();
+		});
+	});
+	it('and not displayed', function(done) {
+		searchInputElement.isDisplayed(function(err, isDisplayed) {
+			if (err) return done(err);
+			expect(isDisplayed).equal(false);
 			done();
 		});
 	});

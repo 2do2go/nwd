@@ -432,14 +432,22 @@ describe('webdriver', function() {
 	});
 
 	function itSearchInputElementEnabled(enabled) {
-		it('search input element is ' + enabled ? 'enabled' : 'disabled', function(done) {
+		it('search input element enabled ' + enabled, function(done) {
 			searchInputElement.isEnabled(function(err, isEnabled) {
 				if (err) return done(err);
 				expect(isEnabled).to.be.a('boolean');
 				expect(isEnabled).equal(enabled);
 				done();
 			});
-		});		
+		});
+		it('search input element disabled ' + !enabled, function(done) {
+			searchInputElement.isDisabled(function(err, isDisabled) {
+				if (err) return done(err);
+				expect(isDisabled).to.be.a('boolean');
+				expect(isDisabled).equal(!enabled);
+				done();
+			});
+		});
 	}
 
 	itSearchInputElementEnabled(true);

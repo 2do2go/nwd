@@ -348,17 +348,31 @@ describe('webdriver', function() {
 		});
 	});
 
-	it('enter login', function(done) {
+	it('enter login using element method', function(done) {
 		loginElement.sendKeys('patrik', expectForElementAndDone(loginElement, done));
 	});
 
-	it('get entered login', function(done) {
-		loginElement.getValue(function(err, login) {
-			if (err) return done(err);
-			expect(login).equal('patrik');
-			done();
+	function itGetEnteredLogin() {
+		it('get entered login', function(done) {
+			loginElement.getValue(function(err, login) {
+				if (err) return done(err);
+				expect(login).equal('patrik');
+				done();
+			});
 		});
+	}
+
+	itGetEnteredLogin();
+
+	it('clear login field', function(done) {
+		loginElement.clear(expectForElementAndDone(loginElement, done));
 	});
+
+	it('enter login using driver method', function(done) {
+		driver.sendKeys('patrik', expectForDriverAndDone(done));
+	});
+
+	itGetEnteredLogin();
 
 	it('clear login field', function(done) {
 		loginElement.clear(expectForElementAndDone(loginElement, done));

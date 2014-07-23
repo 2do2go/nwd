@@ -49,10 +49,19 @@ function expectWebElement(element) {
 
 var driver = null;
 
-function elementCommand(id, action, after, callback) {
+function elementCommand(selector, action, after, callback) {
+	callback = callback || function(err) {
+		if (err) throw err;
+	};
 	setTimeout(function() {
-		var cmd = null,
-			el = 'var el = document.getElementById("' + id + '");';
+		var cmd, el;
+		if (/^#/.test(selector)) {
+			el = 'var el = document.getElementById("' + selector.slice(1) + '");';
+		} else if (/^\./.test(selector)) {
+			el = 'var el = document.getElementsByClassName("' + selector.slice(1) + '");';
+		} else {
+			return callback(new Error('Unrecognized selector: ' + selector));
+		}
 		if (action === 'show') {
 			//HARDCODE: display block
 			cmd = el + 'el.style.display="block";';
@@ -71,9 +80,9 @@ function elementCommand(id, action, after, callback) {
 	}, after || 0);
 }
 
-function itElementCommand(id, action, after) {
-	it(action +' ' + id, function(done) {
-		elementCommand(id, action, after, done);
+function itElementCommand(selector, action, after) {
+	it(action +' ' + selector, function(done) {
+		elementCommand(selector, action, after, done);
 	});
 }
 
@@ -411,7 +420,7 @@ describe('webdriver', function() {
 			if (err) return done(err);
 			done();
 		});
-		elementCommand('js-command-bar-field', 'remove', 50);
+		elementCommand('#js-command-bar-field', 'remove', 50);
 	});
 
 	it('refresh current page', function(done) {
@@ -457,11 +466,11 @@ describe('webdriver', function() {
 
 	itSearchInputElementEnabled(true);
 
-	itElementCommand('js-command-bar-field', 'disable');
+	itElementCommand('#js-command-bar-field', 'disable');
 
 	itSearchInputElementEnabled(false);
 
-	itElementCommand('js-command-bar-field', 'enable');
+	itElementCommand('#js-command-bar-field', 'enable');
 
 	itSearchInputElementEnabled(true);
 
@@ -503,7 +512,7 @@ describe('webdriver', function() {
 		});
 	});
 
-	itElementCommand('top_search_form', 'hide');
+	itElementCommand('#top_search_form', 'hide');
 
 	it('search form element is not visible', function(done) {
 		searchFormElement.isVisible(function(err, isVisible) {
@@ -535,18 +544,18 @@ describe('webdriver', function() {
 		});
 	});
 
-	itElementCommand('top_search_form', 'show');
+	itElementCommand('#top_search_form', 'show');
 
 	it('wait for search for disappear (hide element)', function(done) {
 		searchFormElement.waitForDisappear(expectForDriverAndDone(done));
-		elementCommand('top_search_form', 'hide', 100);
+		elementCommand('#top_search_form', 'hide', 100);
 	});
 
-	itElementCommand('top_search_form', 'show');
+	itElementCommand('#top_search_form', 'show');
 
 	it('wait for search for disappear (remove element)', function(done) {
 		searchFormElement.waitForDisappear(expectForDriverAndDone(done));
-		elementCommand('top_search_form', 'remove', 100);
+		elementCommand('#top_search_form', 'remove', 100);
 	});
 
 	it('wait for new element', function(done) {

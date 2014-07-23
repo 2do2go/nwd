@@ -58,7 +58,7 @@ function elementCommand(selector, action, after, callback) {
 		if (/^#/.test(selector)) {
 			el = 'var el = document.getElementById("' + selector.slice(1) + '");';
 		} else if (/^\./.test(selector)) {
-			el = 'var el = document.getElementsByClassName("' + selector.slice(1) + '");';
+			el = 'var el = document.getElementsByClassName("' + selector.slice(1) + '")[0];';
 		} else {
 			return callback(new Error('Unrecognized selector: ' + selector));
 		}
@@ -569,17 +569,28 @@ describe('webdriver', function() {
 		}, 100);
 	});
 
-	it('get text of heading element', function(done) {
-		driver.get('.heading', function(err, headingElement) {
-			if (err) return done(err);
-			expectWebElement(headingElement);
-			headingElement.getText(function(err, text) {
+	function itGetTextOfHeadingElement(expected) {
+		var label = expected === '' ? 'empty string' : expected;
+		it('text of heading element should be ' + label, function(done) {
+			driver.get('.heading', function(err, headingElement) {
 				if (err) return done(err);
-				expect(text).equal('Build software better, together.');
-				done();
+				expectWebElement(headingElement);
+				headingElement.getText(function(err, text) {
+					if (err) return done(err);
+					expect(text).equal(expected);
+					done();
+				});
 			});
 		});
-	});
+	}
+
+	itGetTextOfHeadingElement('Build software better, together.');
+
+	itElementCommand('.heading', 'hide');
+
+	itGetTextOfHeadingElement('');
+
+	itElementCommand('.heading', 'show');
 
 	it('click on term of service link', function(done) {
 		driver.get('[href="terms-of-service.html"]', function(err, termsElement) {

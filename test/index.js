@@ -415,6 +415,16 @@ describe('webdriver', function() {
 		);
 	});
 	itGetEnteredLogin('spanch');
+
+	it('clear amd enter login using driver element method', function(done) {
+		driver.element.sendKeys(
+			'[name="user[login]"]',
+			'spanch2000',
+			{clear: true},
+			expectForElementAndDone('any', done)
+		);
+	});
+	itGetEnteredLogin('spanch2000');
 	itClearLoginField();
 
 	it('get cleared login', function(done) {

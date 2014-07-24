@@ -361,10 +361,6 @@ describe('webdriver', function() {
 		});
 	});
 
-	it('enter login using element method', function(done) {
-		loginElement.sendKeys('patrik', expectForElementAndDone(loginElement, done));
-	});
-
 	function itGetEnteredLogin(expected, params) {
 		params = params || {};
 		it('get entered login using' +
@@ -389,7 +385,20 @@ describe('webdriver', function() {
 		});
 	}
 
+	it('enter part of login using element method', function(done) {
+		loginElement.sendKeys('pat', expectForElementAndDone(loginElement, done));
+	});
+	itGetEnteredLogin('pat');
+	it('keep entering login', function(done) {
+		loginElement.sendKeys('rik', expectForElementAndDone(loginElement, done));
+	});
 	itGetEnteredLogin('patrik');
+	it('clear and enter login again', function(done) {
+		loginElement.sendKeys('patrik2000', {
+			clear: true
+		}, expectForElementAndDone(loginElement, done));
+	});
+	itGetEnteredLogin('patrik2000');
 	itClearLoginField();
 
 	it('enter login using driver method', function(done) {

@@ -37,7 +37,11 @@ function expectForDriverAndDone(done) {
 
 function expectForElementAndDone(element, done) {
 	return expectAndDone(function(value) {
-		expect(value).equal(element);
+		if (element === 'any') {
+			expectWebElement(value);
+		} else {
+			expect(value).equal(element);
+		}
 	}, done);
 }
 
@@ -361,31 +365,48 @@ describe('webdriver', function() {
 		loginElement.sendKeys('patrik', expectForElementAndDone(loginElement, done));
 	});
 
-	function itGetEnteredLogin() {
-		it('get entered login', function(done) {
-			loginElement.getValue(function(err, login) {
-				if (err) return done(err);
-				expect(login).equal('patrik');
-				done();
-			});
+	function itGetEnteredLogin(expected, params) {
+		params = params || {};
+		it('get entered login using' +
+			(params.useDriverElementMethod ? ' driver ' : ' ') + 'element method',
+			function(done) {
+				function expectAndDone(err, login) {
+					if (err) return done(err);
+					expect(login).equal(expected);
+					done();
+				}
+				if (params.useDriverElementMethod) {
+					driver.element.getValue('[name="user[login]"]', expectAndDone);
+				} else {
+					loginElement.getValue(expectAndDone);
+				}
 		});
 	}
 
-	itGetEnteredLogin();
+	function itClearLoginField() {
+		it('clear login field', function(done) {
+			loginElement.clear(expectForElementAndDone(loginElement, done));
+		});
+	}
 
-	it('clear login field', function(done) {
-		loginElement.clear(expectForElementAndDone(loginElement, done));
-	});
+	itGetEnteredLogin('patrik');
+	itClearLoginField();
 
 	it('enter login using driver method', function(done) {
-		driver.sendKeys('patrik', expectForDriverAndDone(done));
+		driver.sendKeys('bob', expectForDriverAndDone(done));
 	});
+	itGetEnteredLogin('bob', {useDriverElementMethod: true});
+	itClearLoginField();
 
-	itGetEnteredLogin();
-
-	it('clear login field', function(done) {
-		loginElement.clear(expectForElementAndDone(loginElement, done));
+	it('enter login using driver element method', function(done) {
+		driver.element.sendKeys(
+			'[name="user[login]"]',
+			'spanch',
+			expectForElementAndDone('any', done)
+		);
 	});
+	itGetEnteredLogin('spanch');
+	itClearLoginField();
 
 	it('get cleared login', function(done) {
 		loginElement.getValue(function(err, login) {
@@ -569,22 +590,35 @@ describe('webdriver', function() {
 		}, 100);
 	});
 
-	function itGetTextOfHeadingElement(expected) {
+	function itGetTextOfHeadingElement(expected, params) {
+		params = params || {};
 		var label = expected === '' ? 'empty string' : expected;
-		it('text of heading element should be ' + label, function(done) {
-			driver.get('.heading', function(err, headingElement) {
-				if (err) return done(err);
-				expectWebElement(headingElement);
-				headingElement.getText(function(err, text) {
-					if (err) return done(err);
-					expect(text).equal(expected);
-					done();
-				});
-			});
+		it('get text of heading element using' +
+			(params.useDriverElementMethod ? ' driver ' : ' ')
+			+ 'element method it should be equal to ' + label,
+			function(done) {
+				if (params.useDriverElementMethod) {
+					driver.element.getText('.heading', function(err, text) {
+						if (err) return done(err);
+						expect(text).equal(expected);
+						done();
+					});
+				} else {
+					driver.get('.heading', function(err, headingElement) {
+						if (err) return done(err);
+						expectWebElement(headingElement);
+						headingElement.getText(function(err, text) {
+							if (err) return done(err);
+							expect(text).equal(expected);
+							done();
+						});
+					});
+				}
 		});
 	}
 
 	itGetTextOfHeadingElement('Build software better, together.');
+	itGetTextOfHeadingElement('Build software better, together.', {useDriverElementMethod: true});
 
 	itElementCommand('.heading', 'hide');
 

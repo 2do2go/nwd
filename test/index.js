@@ -435,6 +435,38 @@ describe('webdriver', function() {
 		});
 	});
 
+	var checkbox = null;
+	it('get test checkbox', function(done) {
+		driver.get('#test-checkbox', function(err, element) {
+			if (err) return done(err);
+			expectWebElement(element);
+			checkbox = element;
+			done();
+		});
+	});
+
+	it('test checkbox is selected', function(done) {
+		checkbox.isSelected(function(err, selected) {
+			if (err) return done(err);
+			expect(selected).to.be.a('boolean');
+			expect(selected).to.be(true);
+			done();
+		});
+	});
+
+	it('click on test checkbox', function(done) {
+		checkbox.click(expectForElementAndDone(checkbox, done));
+	});
+
+	it('test checkbox is not selected', function(done) {
+		checkbox.isSelected(function(err, selected) {
+			if (err) return done(err);
+			expect(selected).to.be.a('boolean');
+			expect(selected).to.be(false);
+			done();
+		});
+	});
+
 	var searchFormElement = null;
 	it('get search form element', function(done) {
 		driver.get('#top_search_form', function(err, element) {

@@ -335,6 +335,38 @@ describe('webdriver', function() {
 			});
 	});
 
+	it('set login element via Element.element', function(done) {
+		formElement.element.sendKeys('[name="user[login]"]', 'abc', function(err, element) {
+			if (err) return done(err);
+			expectWebElement(element);
+			done();
+		});
+	});
+
+	it('check login element value', function(done) {
+		formElement.element.getValue('[name="user[login]"]', function(err, value) {
+			if (err) return done(err);
+			expect(value).to.be('abc');
+			done();
+		});
+	});
+
+	it('clear login element value', function(done) {
+		formElement.element.clear('[name="user[login]"]', function(err, element) {
+			if (err) return done(err);
+			expectWebElement(element);
+			done();
+		});
+	});
+
+	it('check login element value', function(done) {
+		formElement.element.getValue('[name="user[login]"]', function(err, value) {
+			if (err) return done(err);
+			expect(value).to.be('');
+			done();
+		});
+	});
+
 	var loginElement = null;
 	it('get login element', function(done) {
 		driver.get('[name="user[login]"]', function(err, element) {

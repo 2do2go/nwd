@@ -1,3 +1,4 @@
 .npmignore
 test
 benchmark
+phantomjs.log

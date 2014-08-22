@@ -1,7 +1,7 @@
 {
 	"name": "nwd",
 	"description": "pure node.js implementation of Selenium WebDriver Wire Protocol",
-	"version": "0.1.8",
+	"version": "0.1.9",
 	"author": "Oleg Korobenko <oleg.korobenko@gmail.com>",
 	"repository": {
 		"type": "git",
@@ -10,15 +10,17 @@
 	"keywords": [
 		"webdriver", "selenium", "test", "browser"
 	],
-	"scripts": {
-		"test": "mocha test --reporter spec --bail --async-only",
-		"doc": "jsdoc lib docs/README.md -d docs/built"
-	},
 	"dependencies": {},
 	"devDependencies": {
 		"mocha": "1.11.0",
 		"expect.js": "0.2.0",
-		"jsdoc": "3.2.2"
+		"jsdoc": "3.2.2",
+		"phantomjs": "1.9.7-8"
 	},
-	"main": "./lib/index"
+	"main": "./lib/index",
+	"scripts": {
+		"test": "mocha test --reporter spec --bail --async-only",
+		"testPhantom": "{ phantomjs --webdriver 127.0.0.1:4444 > ./phantomjs.log 2>&1 & } && ID=$! && npm run test; kill $ID",
+		"doc": "jsdoc lib docs/README.md -d docs/built"
+	}
 }

@@ -1,7 +1,7 @@
 {
 	"name": "nwd",
 	"description": "pure node.js implementation of Selenium WebDriver Wire Protocol",
-	"version": "0.1.9",
+	"version": "0.1.10",
 	"author": "Oleg Korobenko <oleg.korobenko@gmail.com>",
 	"repository": {
 		"type": "git",

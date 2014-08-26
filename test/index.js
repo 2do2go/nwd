@@ -287,6 +287,16 @@ describe('webdriver', function() {
 		});
 	});
 
+	it('get explore link href attr via attr', function(done) {
+		driver.get('.explore a', function(err, element) {
+			element.attr('href', function(err, href) {
+				if (err) return done(err);
+				expect(href).to.be('https://github.com/explore');
+				done();
+			});
+		});
+	});
+
 	var formElement = null;
 	it('get form element', function(done) {
 		driver.get('.js-form-signup-home', function(err, element) {

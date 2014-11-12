@@ -608,6 +608,14 @@ describe('webdriver', function() {
 				done();
 			});
 		});
+		it('search input element disabled ' + !enabled + ' using `prop`', function(done) {
+			searchInputElement.prop('disabled', function(err, isDisabled) {
+				if (err) return done(err);
+				expect(isDisabled).to.be.a('boolean');
+				expect(isDisabled).equal(!enabled);
+				done();
+			});
+		});
 	}
 
 	itSearchInputElementEnabled(true);
@@ -620,8 +628,16 @@ describe('webdriver', function() {
 
 	itSearchInputElementEnabled(true);
 
-	it('get search form visibility', function(done) {
+	it('get search form visibility using selenium method', function(done) {
 		searchFormElement.getCssProp('visibility', function(err, visibility) {
+			if (err) return callback(err);
+			expect(visibility).equal('visible');
+			done();
+		});
+	});
+
+	it('get search form visibility using jquery method', function(done) {
+		searchFormElement.css('visibility', function(err, visibility) {
 			if (err) return callback(err);
 			expect(visibility).equal('visible');
 			done();

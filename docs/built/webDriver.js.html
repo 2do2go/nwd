@@ -34,6 +34,12 @@ var http = require('http'),
 	errors = require('./errors'),
 	WebElement = require('./webElement').WebElement;
 
+function returnSelf(callback, self) {
+	return function(err) {
+		callback(err, self);
+	};
+}
+
 /**
  * Driver constructor
  * @class WebDriver
@@ -119,7 +125,7 @@ WebDriver.prototype._initElement = function() {
 				getArgs = [selector];
 				methodArgs = Array.prototype.slice.call(arguments, 1);
 			}
-			
+
 			var callback = methodArgs[methodArgs.length - 1];
 			getArgs.push(function(err, element) {
 				if (err) return callback(err);
@@ -177,15 +183,8 @@ WebDriver.prototype._cmd = function(params, callback) {
 			var errorConstructor = errors.getProtocolErrorContructor(res.data.status);
 			return callback(new errorConstructor());
 		}
-		// return `res` if it needed, otherwise `res.data.value` or `this` (for
-		// chaining)
-		var value = res.data.value;
-		callback(null, params.resNeeded ? res : (
-			// ghostdriver can return value with null or empty object
-			value !== undefined && value !== null && (Array.isArray(value) ||
-			!utils.isObject(value) || !utils.isEmptyObject(value))
-				? res.data.value : self
-		));
+		// return `res` if it needed, otherwise `res.data.value`
+		callback(null, params.resNeeded ? res : res.data.value);
 	});
 };
 
@@ -228,9 +227,7 @@ WebDriver.prototype.init = function(callback) {
 			return callback(new Error('Can`t determine session id'));
 		}
 		self.sessionBasePath = self.sessionBasePath + '/' + self.sessionId;
-		self.setTimeouts(self.timeouts, function(err) {
-			callback(err, self);
-		});
+		self.setTimeouts(self.timeouts, returnSelf(callback, self));
 	});
 };
 
@@ -239,7 +236,7 @@ WebDriver.prototype.init = function(callback) {
  * @param {Function} callback(err:Error)
  */
 WebDriver.prototype.deleteSession = function(callback) {
-	this._cmd({path: '', method: 'DELETE'}, callback);
+	this._cmd({path: '', method: 'DELETE'}, returnSelf(callback, this));
 };
 
 /**
@@ -248,7 +245,7 @@ WebDriver.prototype.deleteSession = function(callback) {
  * @param {Function} callback(err:Error)
  */
 WebDriver.prototype.setUrl = function(url, callback) {
-	this._cmd({path: '/url', data: {url: url}}, callback);
+	this._cmd({path: '/url', data: {url: url}}, returnSelf(callback, this));
 };
 
 /**
@@ -283,7 +280,7 @@ var sweetenCssSelector = function(value) {
 var jqueryInjection = 'function ___nwdJquery() {' +
 	fs.readFileSync(path.resolve(
 		__dirname, '..', 'injections', 'jquery.min.js'
-	)) + 
+	)) +
 '}';
 
 var jqueryGetElementsInjection = utils.getInjectionSource(function() {
@@ -739,7 +736,7 @@ WebDriver.prototype.deleteCookie = function(name, callback) {
 	this._cmd({
 		path: name ? '/cookie/' + name : '/cookie',
 		method: 'DELETE'
-	}, callback);
+	}, returnSelf(callback, this));
 };
 
 /**
@@ -767,7 +764,7 @@ WebDriver.prototype.maximizeWindow = function(callback) {
 	this._cmd({
 		path: '/window/current/maximize',
 		method: 'POST'
-	}, callback);
+	}, returnSelf(callback, this));
 };
 
 /**
@@ -775,7 +772,7 @@ WebDriver.prototype.maximizeWindow = function(callback) {
  * @param {Function} callback(err:Error,driver:WebDriver)
  */
 WebDriver.prototype.back = function(callback) {
-	this._cmd({path: '/back', method: 'POST'}, callback);
+	this._cmd({path: '/back', method: 'POST'}, returnSelf(callback, this));
 };
 
 /**
@@ -783,7 +780,7 @@ WebDriver.prototype.back = function(callback) {
  * @param {Function} callback(err:Error,driver:WebDriver)
  */
 WebDriver.prototype.forward = function(callback) {
-	this._cmd({path: '/forward', method: 'POST'}, callback);
+	this._cmd({path: '/forward', method: 'POST'}, returnSelf(callback, this));
 };
 
 /**
@@ -791,7 +788,7 @@ WebDriver.prototype.forward = function(callback) {
  * @param {Function} callback(err:Error,driver:WebDriver)
  */
 WebDriver.prototype.refresh = function(callback) {
-	this._cmd({path: '/refresh', method: 'POST'}, callback);
+	this._cmd({path: '/refresh', method: 'POST'}, returnSelf(callback, this));
 };
 
 var mouseButtons = {
@@ -815,7 +812,7 @@ WebDriver.prototype.mouseDown = function(button, callback) {
 		path: '/buttondown',
 		method: 'POST',
 		data: {button: mouseButtons[button]}
-	}, callback);
+	}, returnSelf(callback, this));
 };
 
 /**
@@ -832,7 +829,7 @@ WebDriver.prototype.mouseUp = function(button, callback) {
 		path: '/buttonup',
 		method: 'POST',
 		data: {button: mouseButtons[button]}
-	}, callback);
+	}, returnSelf(callback, this));
 };
 
 /**
@@ -850,7 +847,7 @@ WebDriver.prototype.click = function(button, callback) {
 		path: '/click',
 		method: 'POST',
 		data: {button: mouseButtons[button]}
-	}, callback);
+	}, returnSelf(callback, this));
 };
 
 /**
@@ -863,7 +860,15 @@ WebDriver.prototype.sendKeys = function(value, callback) {
 		path: '/keys',
 		method: 'POST',
 		data: {value: utils.replaceKeyStrokesWithCodes(value).split('')}
-	}, callback);
+	}, returnSelf(callback, this));
+};
+
+/**
+ * Retrieve the capabilities of the current session
+ * @param {Function} callback(err:Error,capabilities:Object)
+ */
+WebDriver.prototype.getCapabilities = function(callback) {
+	this._cmd({path: '', method: 'GET'}, callback);
 };
 
 utils.loggify(WebDriver.prototype, 'WebDriver');
@@ -885,7 +890,7 @@ exports.WebDriver = WebDriver;
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Fri Aug 22 2014 11:39:06 GMT+0400 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Wed Nov 12 2014 20:14:13 GMT+0300 (MSK)
 </footer>
 
 <script> prettyPrint(); </script>

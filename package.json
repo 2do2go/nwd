@@ -20,7 +20,7 @@
 	"main": "./lib/index",
 	"scripts": {
 		"test": "mocha test --reporter spec --bail --async-only",
-		"testPhantom": "{ phantomjs --webdriver 127.0.0.1:4444 > ./phantomjs.log 2>&1 & } && ID=$! && npm run test; kill $ID",
+		"testPhantom": "{ phantomjs --webdriver 127.0.0.1:4444 --ignore-ssl-errors yes > ./phantomjs.log 2>&1 & } && ID=$! && echo 'Wait for phantom start...' && while [ \"`grep 'running on port' ./phantomjs.log`\" = \"\" ]; do sleep 0.1; done && npm run test; kill $ID",
 		"doc": "jsdoc lib docs/README.md -d docs/built"
 	}
 }

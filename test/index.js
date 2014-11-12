@@ -98,6 +98,38 @@ describe('webdriver', function() {
 		driver.init(expectForDriverAndDone(done));
 	});
 
+	var currentCapabilities;
+	it('get capabilities without error', function(done) {
+		driver.getCapabilities(function(err, capabilities) {
+			if (err) return done(err);
+			currentCapabilities = capabilities;
+			done();
+		});
+	});
+	var capabilitiesByTypes = {
+		string: ['browserName', 'version', 'platform'],
+		boolean: [
+			'javascriptEnabled',
+			'takesScreenshot', 'handlesAlerts', 'databaseEnabled',
+			'locationContextEnabled', 'applicationCacheEnabled',
+			'browserConnectionEnabled', 'cssSelectorsEnabled',
+			'webStorageEnabled', 'rotatable', 'acceptSslCerts',
+			'nativeEvents'
+		]
+	};
+	Object.keys(capabilitiesByTypes).forEach(function(type) {
+		capabilitiesByTypes[type].forEach(function(field) {
+			it(
+				'capabilities should have "' + field + '" of type "' + type + '"',
+				function(done) {
+					expect(currentCapabilities).have.key(field);
+					expect(currentCapabilities[field]).to.be.a(type);
+					done();
+				}
+			);
+		});
+	});
+
 	it('delete cookie', function(done) {
 		driver.deleteCookie(expectForDriverAndDone(done));
 	});

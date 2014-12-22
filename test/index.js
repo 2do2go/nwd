@@ -733,37 +733,45 @@ describe('webdriver', function() {
 
 	function itGetTextOfHeadingElement(expected, params) {
 		params = params || {};
-		var label = expected === '' ? 'empty string' : expected;
-		it('get text of heading element using' +
-			(params.useDriverElementMethod ? ' driver ' : ' ')
-			+ 'element method it should be equal to ' + label,
-			function(done) {
-				if (params.useDriverElementMethod) {
-					driver.element.getText('.heading', function(err, text) {
+		var methodName = params.useJqueryTextMethod ? 'text' : 'getText';
+		var label = 'get text of heading element using .' + methodName + '() ';
+		if (params.useDriverElementMethod) {
+			label += 'driver ';
+		}
+		label += 'element method it should be equal to ' +
+			(expected === '' ? 'empty string' : '"' + expected + '"');
+
+		it(label, function(done) {
+			if (params.useDriverElementMethod) {
+				driver.element[methodName]('.heading', function(err, text) {
+					if (err) return done(err);
+					expect(text).equal(expected);
+					done();
+				});
+			} else {
+				driver.get('.heading', function(err, headingElement) {
+					if (err) return done(err);
+					expectWebElement(headingElement);
+					headingElement[methodName](function(err, text) {
 						if (err) return done(err);
 						expect(text).equal(expected);
 						done();
 					});
-				} else {
-					driver.get('.heading', function(err, headingElement) {
-						if (err) return done(err);
-						expectWebElement(headingElement);
-						headingElement.getText(function(err, text) {
-							if (err) return done(err);
-							expect(text).equal(expected);
-							done();
-						});
-					});
-				}
+				});
+			}
 		});
 	}
 
 	itGetTextOfHeadingElement('Build software better, together.');
 	itGetTextOfHeadingElement('Build software better, together.', {useDriverElementMethod: true});
 
+	itGetTextOfHeadingElement('Build software better, together.', {useJqueryTextMethod: true});
+	itGetTextOfHeadingElement('Build software better, together.', {useJqueryTextMethod: true, useDriverElementMethod: true});
+
 	itElementCommand('.heading', 'hide');
 
 	itGetTextOfHeadingElement('');
+	itGetTextOfHeadingElement('Build software better, together.', {useJqueryTextMethod: true});
 
 	itElementCommand('.heading', 'show');
 

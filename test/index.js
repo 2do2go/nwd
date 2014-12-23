@@ -160,8 +160,12 @@ describe('webdriver', function() {
 
 	var defaultScriptTimeout = null;
 	it('get default script timeout', function(done) {
-		defaultScriptTimeout = driver.getTimeout('script');
-		done();
+		driver.getTimeout('script', function(err, timeout) {
+			if (err) done(err);
+			expect(timeout).to.be.a('number');
+			defaultScriptTimeout = timeout;
+			done();
+		});
 	});
 
 	it('set custom script timeout', function(done) {
@@ -169,8 +173,11 @@ describe('webdriver', function() {
 	});
 
 	it('get custom script timeout', function(done) {
-		expect(driver.getTimeout('script')).equal(500);
-		done();
+		driver.getTimeout('script', function(err, timeout) {
+			if (err) done(err);
+			expect(timeout).equal(500);
+			done();
+		});
 	});
 
 	it('set default script timeout', function(done) {

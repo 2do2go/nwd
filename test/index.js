@@ -424,6 +424,54 @@ describe('webdriver', function() {
 		});
 	});
 
+	it('wait for new element', function(done) {
+		driver.waitForElement('#new-element', expectForDriverAndDone(done));
+		setTimeout(function() {
+			driver.execute(function() {
+				var el = document.createElement('div');
+				el.setAttribute('id', 'new-element');
+				document.body.appendChild(el);
+			}, [], false, function() {});
+		}, 100);
+	});
+
+	it('wait for new element inside form', function(done) {
+		formElement.waitForElement(
+			'#new-element2',
+			expectForDriverAndDone(done)
+		);
+		setTimeout(function() {
+			driver.execute(function() {
+				var el = document.createElement('div');
+				el.setAttribute('id', 'new-element2');
+				arguments[0].appendChild(el);
+			}, [{ELEMENT: formElement.id}], false, function() {});
+		}, 100);
+	});
+
+	// it(
+	// 	'wait for new element inside form should fail if element appear ' +
+	// 	'outside form',
+	// 	function(done) {
+	// 		formElement.waitForElement(
+	// 			'#new-element3',
+	// 			{timeout: 200},
+	// 			function(err) {
+	// 				console.log('>>> err = ', err)
+	// 				expect(err).to.be.an(Error);
+	// 				done();
+	// 			}
+	// 		);
+	// 		setTimeout(function() {
+	// 			driver.execute(function() {
+	// 				var el = document.createElement('div');
+	// 				el.setAttribute('id', 'new-element3');
+	// 				document.body.appendChild(el);
+	// 			}, [], false, function() {});
+	// 		}, 100);
+	// 	}
+	// );
+
 	var loginElement = null;
 	it('get login element', function(done) {
 		driver.get('[name="user[login]"]', function(err, element) {
@@ -733,17 +781,6 @@ describe('webdriver', function() {
 	it('wait for search for disappear (remove element)', function(done) {
 		searchFormElement.waitForDisappear(expectForDriverAndDone(done));
 		elementCommand('#top_search_form', 'remove', 100);
-	});
-
-	it('wait for new element', function(done) {
-		driver.waitForElement('#new-element', expectForDriverAndDone(done));
-		setTimeout(function() {
-			driver.execute(function() {
-				var el = document.createElement('div');
-				el.setAttribute('id', 'new-element');
-				document.body.appendChild(el);
-			}, [], false, function() {});
-		}, 100);
 	});
 
 	function itGetTextOfHeadingElement(expected, params) {

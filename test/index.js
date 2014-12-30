@@ -449,28 +449,31 @@ describe('webdriver', function() {
 		}, 100);
 	});
 
-	// it(
-	// 	'wait for new element inside form should fail if element appear ' +
-	// 	'outside form',
-	// 	function(done) {
-	// 		formElement.waitForElement(
-	// 			'#new-element3',
-	// 			{timeout: 200},
-	// 			function(err) {
-	// 				console.log('>>> err = ', err)
-	// 				expect(err).to.be.an(Error);
-	// 				done();
-	// 			}
-	// 		);
-	// 		setTimeout(function() {
-	// 			driver.execute(function() {
-	// 				var el = document.createElement('div');
-	// 				el.setAttribute('id', 'new-element3');
-	// 				document.body.appendChild(el);
-	// 			}, [], false, function() {});
-	// 		}, 100);
-	// 	}
-	// );
+	it(
+		'wait for new element inside form should fail if element appear ' +
+		'outside form',
+		function(done) {
+			formElement.waitForElement(
+				'#new-element3',
+				{timeout: 200},
+				function(err) {
+					expect(err).to.be.an(Error);
+					expect(err.message).equal(
+						'Timeout (200 ms) exceeded while waiting for ' +
+						'element #new-element3'
+					);
+					done();
+				}
+			);
+			setTimeout(function() {
+				driver.execute(function() {
+					var el = document.createElement('div');
+					el.setAttribute('id', 'new-element3');
+					document.body.appendChild(el);
+				}, [], false, function() {});
+			}, 100);
+		}
+	);
 
 	var loginElement = null;
 	it('get login element', function(done) {

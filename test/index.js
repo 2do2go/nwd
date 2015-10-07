@@ -943,6 +943,14 @@ describe('webdriver', function() {
 		});
 	});
 
+	it('get log', function(done) {
+		driver.getLog('browser', function(err, log) {
+			if (err) return done(err);
+			expect(log).to.be.an('array');
+			done();
+		});
+	});
+
 	it('delete session', function(done) {
 		driver.deleteSession(expectForDriverAndDone(done));
 	});

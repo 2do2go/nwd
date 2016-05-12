@@ -58,25 +58,19 @@ function elementCommand(selector, action, after, callback) {
 		if (err) throw err;
 	};
 	setTimeout(function() {
-		var cmd, el;
-		if (/^#/.test(selector)) {
-			el = 'var el = document.getElementById("' + selector.slice(1) + '");';
-		} else if (/^\./.test(selector)) {
-			el = 'var el = document.getElementsByClassName("' + selector.slice(1) + '")[0];';
-		} else {
-			return callback(new Error('Unrecognized selector: ' + selector));
-		}
+		var cmd = 'var el = document.querySelector(\'' + selector + '\');';
+
 		if (action === 'show') {
 			//HARDCODE: display block
-			cmd = el + 'el.style.display="block";';
+			cmd += 'el.style.display="block";';
 		} else if (action === 'hide') {
-			cmd = el + 'el.style.display="none";';
+			cmd += 'el.style.display="none";';
 		} else if (action === 'remove') {
-			cmd = el + 'el.parentNode.removeChild(el);';
+			cmd += 'el.parentNode.removeChild(el);';
 		} else if (action === 'disable') {
-			cmd = el + 'el.disabled=true;';
+			cmd += 'el.disabled=true;';
 		} else if (action === 'enable') {
-			cmd = el + 'el.disabled=false;';
+			cmd += 'el.disabled=false;';
 		} else {
 			callback(new Error('Unknown action: ' + action));
 		}
@@ -85,7 +79,7 @@ function elementCommand(selector, action, after, callback) {
 }
 
 function itElementCommand(selector, action, after) {
-	it(action +' ' + selector, function(done) {
+	it(action + ' ' + selector, function(done) {
 		elementCommand(selector, action, after, done);
 	});
 }
@@ -882,6 +876,10 @@ describe('webdriver', function() {
 
 	var termsElement = null;
 	function getTermsElement() {
+		it('make terms-of-service link inline-block', function(done) {
+			elementCommand('[href="terms-of-service.html"]', 'show', 0, done);
+		});
+
 		it('get term of service link element', function(done) {
 			driver.get('[href="terms-of-service.html"]', function(err, element) {
 				if (err) return done(err);

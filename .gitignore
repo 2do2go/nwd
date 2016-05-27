@@ -1,2 +1,3 @@
 node_modules/
 phantomjs.log
+npm-debug.log

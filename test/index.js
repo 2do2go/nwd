@@ -452,6 +452,7 @@ describe('webdriver', function() {
 				{timeout: 200},
 				function(err) {
 					expect(err).to.be.an(Error);
+					// console.log(err.message);
 					expect(err.message).equal(
 						'Timeout (200 ms) exceeded while waiting for ' +
 						'element #new-element3'
@@ -550,7 +551,7 @@ describe('webdriver', function() {
 	});
 	itGetEnteredLogin('spanch');
 
-	it('clear amd enter login using driver element method', function(done) {
+	it('clear and enter login using driver element method', function(done) {
 		driver.element.sendKeys(
 			'[name="user[login]"]',
 			'spanch2000',

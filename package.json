@@ -17,6 +17,7 @@
   "devDependencies": {
     "expect.js": "0.2.0",
     "jsdoc": "3.2.2",
+    "jshint": "2.4.4",
     "mocha": "1.11.0",
     "node-static": "0.7.7",
     "phantomjs": "1.9.7-8",
@@ -24,8 +25,9 @@
   },
   "main": "./lib/index",
   "scripts": {
-    "test": "mocha test --reporter spec --bail --async-only",
-    "testPhantom": "{ phantomjs --webdriver 127.0.0.1:4444 --ignore-ssl-errors yes > ./phantomjs.log 2>&1 & } && ID=$! && echo 'Wait for phantom start...' && while [ \"`grep 'running on port' ./phantomjs.log`\" = \"\" ]; do sleep 0.1; done && npm run test; kill $ID",
+    "test": "./node_modules/.bin/jshint . && { if [ -z $NODE_TESTUI_BROWSER ] || [ $NODE_TESTUI_BROWSER == 'phantom' ]; then npm run testPhantom; else npm run _test; fi }",
+    "testPhantom": "{ phantomjs --webdriver 127.0.0.1:4444 --ignore-ssl-errors yes > ./phantomjs.log 2>&1 & } && ID=$! && echo 'Wait for phantom start...' && while [ \"`grep 'running on port' ./phantomjs.log`\" = \"\" ]; do sleep 0.1; done && npm run _test; kill $ID",
+    "_test": "mocha test --reporter spec --bail --async-only",
     "doc": "jsdoc lib docs/README.md -d docs/built"
   }
 }

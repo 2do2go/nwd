@@ -172,7 +172,7 @@ describe('webdriver', function() {
 
 	var capabilitiesByTypes = {
 		string: ['browserName', 'version', 'platform'],
-		boolean: booleanCapabilities
+		'boolean': booleanCapabilities
 	};
 
 	_(capabilitiesByTypes).each( function(capabilitiesByType, type) {
@@ -394,13 +394,15 @@ describe('webdriver', function() {
 		});
 	});
 
-	it('get explore link href attr via attr using driver element method', function(done) {
-		driver.element.attr('.explore a', 'href', function(err, href) {
-			if (err) return done(err);
-			expect(href).to.be('https://github.com/explore');
-			done();
-		});
-	});
+	it('get explore link href attr via attr using driver element method',
+		function(done) {
+			driver.element.attr('.explore a', 'href', function(err, href) {
+				if (err) return done(err);
+				expect(href).to.be('https://github.com/explore');
+				done();
+			});
+		}
+	);
 
 	var formElement = null;
 	it('get form element', function(done) {
@@ -457,11 +459,15 @@ describe('webdriver', function() {
 	});
 
 	it('set login element via Element.element', function(done) {
-		formElement.element.sendKeys('[name="user[login]"]', 'abc', function(err, element) {
-			if (err) return done(err);
-			expectWebElement(element);
-			done();
-		});
+		formElement.element.sendKeys(
+			'[name="user[login]"]',
+			'abc',
+			function(err, element) {
+				if (err) return done(err);
+				expectWebElement(element);
+				done();
+			}
+		);
 	});
 
 	it('check login element value', function(done) {
@@ -492,9 +498,11 @@ describe('webdriver', function() {
 		driver.waitForElement('#new-element', expectForDriverAndDone(done));
 		setTimeout(function() {
 			driver.execute(function() {
+				/*jshint ignore:start*/
 				var el = document.createElement('div');
 				el.setAttribute('id', 'new-element');
 				document.body.appendChild(el);
+				/*jshint ignore:end*/
 			}, [], false, function() {});
 		}, 100);
 	});
@@ -506,9 +514,11 @@ describe('webdriver', function() {
 		);
 		setTimeout(function() {
 			driver.execute(function() {
+				/*jshint ignore:start*/
 				var el = document.createElement('div');
 				el.setAttribute('id', 'new-element2');
 				arguments[0].appendChild(el);
+				/*jshint ignore:end*/
 			}, [{ELEMENT: formElement.id}], false, function() {});
 		}, 100);
 	});
@@ -531,9 +541,11 @@ describe('webdriver', function() {
 			);
 			setTimeout(function() {
 				driver.execute(function() {
+					/*jshint ignore:start*/
 					var el = document.createElement('div');
 					el.setAttribute('id', 'new-element3');
 					document.body.appendChild(el);
+					/*jshint ignore:end*/
 				}, [], false, function() {});
 			}, 100);
 		}
@@ -567,7 +579,8 @@ describe('webdriver', function() {
 
 	function itGetEnteredLogin(expected, params) {
 		params = params || {};
-		it('get entered login using' +
+		it(
+			'get entered login using' +
 			(params.useDriverElementMethod ? ' driver ' : ' ') + 'element method',
 			function(done) {
 				function expectAndDone(err, login) {
@@ -580,7 +593,8 @@ describe('webdriver', function() {
 				} else {
 					loginElement.getValue(expectAndDone);
 				}
-		});
+			}
+		);
 	}
 
 	function itClearLoginField() {
@@ -691,7 +705,7 @@ describe('webdriver', function() {
 		});
 	});
 
-	it('wait for search input detach (remove element after 50 ms)', function(done) {
+	it('wait for search input detach(remove element after 50 ms)', function(done) {
 		searchInputElement.waitForDetach(function(err) {
 			if (err) return done(err);
 			done();
@@ -716,7 +730,7 @@ describe('webdriver', function() {
 		});
 	});
 
-	it('get search input element (should exist after page refresh)', function(done) {
+	it('get search input element(should exist after refresh)', function(done) {
 		driver.get('#js-command-bar-field', function(err, element) {
 			if (err) return done(err);
 			expectWebElement(element);
@@ -742,14 +756,16 @@ describe('webdriver', function() {
 				done();
 			});
 		});
-		it('search input element disabled ' + !enabled + ' using `prop`', function(done) {
-			searchInputElement.prop('disabled', function(err, isDisabled) {
-				if (err) return done(err);
-				expect(isDisabled).to.be.a('boolean');
-				expect(isDisabled).equal(!enabled);
-				done();
-			});
-		});
+		it('search input element disabled ' + !enabled + ' using `prop`',
+			function(done) {
+				searchInputElement.prop('disabled', function(err, isDisabled) {
+					if (err) return done(err);
+					expect(isDisabled).to.be.a('boolean');
+					expect(isDisabled).equal(!enabled);
+					done();
+				});
+			}
+		);
 	}
 
 	itSearchInputElementEnabled(true);
@@ -764,7 +780,7 @@ describe('webdriver', function() {
 
 	it('get search form visibility using selenium method', function(done) {
 		searchFormElement.getCssProp('visibility', function(err, visibility) {
-			if (err) return callback(err);
+			if (err) return done(err);
 			expect(visibility).equal('visible');
 			done();
 		});
@@ -772,7 +788,7 @@ describe('webdriver', function() {
 
 	it('get search form visibility using jquery method', function(done) {
 		searchFormElement.css('visibility', function(err, visibility) {
-			if (err) return callback(err);
+			if (err) return done(err);
 			expect(visibility).equal('visible');
 			done();
 		});
@@ -886,15 +902,24 @@ describe('webdriver', function() {
 	}
 
 	itGetTextOfHeadingElement('Build software better, together.');
-	itGetTextOfHeadingElement('Build software better, together.', {useDriverElementMethod: true});
+	itGetTextOfHeadingElement('Build software better, together.', {
+		useDriverElementMethod: true
+	});
 
-	itGetTextOfHeadingElement('Build software better, together.', {useJqueryTextMethod: true});
-	itGetTextOfHeadingElement('Build software better, together.', {useJqueryTextMethod: true, useDriverElementMethod: true});
+	itGetTextOfHeadingElement('Build software better, together.', {
+		useJqueryTextMethod: true
+	});
+	itGetTextOfHeadingElement('Build software better, together.', {
+		useJqueryTextMethod: true,
+		useDriverElementMethod: true
+	});
 
 	itElementCommand('.heading', 'hide');
 
 	itGetTextOfHeadingElement('');
-	itGetTextOfHeadingElement('Build software better, together.', {useJqueryTextMethod: true});
+	itGetTextOfHeadingElement('Build software better, together.', {
+		useJqueryTextMethod: true
+	});
 
 	itElementCommand('.heading', 'show');
 

@@ -5,19 +5,53 @@ var expect = require('expect.js'),
 	WebElement = require('../lib').WebElement,
 	errors = require('../lib').errors,
 	path = require('path'),
+	_ = require('underscore'),
+	os = require('os'),
+	http = require('http'),
+	FileServer = require('node-static').Server,
 	fs = require('fs');
 
+var staticServerParams = {
+	host: _(os.networkInterfaces()).chain().find(function(ni, name) {
+			return name !== 'lo';
+		}).find(function(ni) {
+			return !ni.internal && ni.family === 'IPv4';
+		}).value().address,
+	port: process.env.NODE_LISTEN_PORT || 8888
+};
+
+var fileServer = new FileServer('./test/fixtures');
+
+var staticServer = http.createServer(function(req, res) {
+	req.addListener('end', function() {
+		fileServer.serve(req, res);
+	}).resume();
+});
+
 var driverParams = {
-	host: '127.0.0.1',
-	port: 4444,
+	host: process.env.NODE_TESTUI_HOST || '127.0.0.1',
+	port: process.env.NODE_TESTUI_PORT || 4444,
 	desiredCapabilities: {
 		acceptSslCerts: true,
-		browserName: 'chrome'
+		browserName: process.env.NODE_TESTUI_BROWSER || 'chrome'
 	}
 };
 
+var indexUrl = 'github/index.html';
+// var indexUrl = 'index.html';
+var termsOfServiceUrl = 'github/terms-of-service.html';
+// var termsOfServiceUrl = 'terms-of-service.html';
+
 function getFixturePath(name) {
-	return 'file://' + __dirname + '/fixtures/' + name;
+	// return 'file://' + __dirname + '/fixtures/' + name;
+	return [
+		'http://',
+		staticServerParams.host,
+		':',
+		staticServerParams.port,
+		'/',
+		name
+	].join('');
 }
 
 function expectAndDone(assert, done) {
@@ -25,7 +59,7 @@ function expectAndDone(assert, done) {
 		if (err) return done(err);
 		assert(value);
 		done();
-	}
+	};
 }
 
 // expect that callback returns instance of WebDriver and done the test
@@ -85,7 +119,15 @@ function itElementCommand(selector, action, after) {
 }
 
 describe('webdriver', function() {
-	this.timeout(10000);
+	this.timeout(16000);
+
+	before(function(done) {
+		staticServer.listen(
+			staticServerParams.port,
+			staticServerParams.host,
+			done
+		);
+	});
 
 	it('init without errors', function(done) {
 		driver = new WebDriver(driverParams);
@@ -100,19 +142,41 @@ describe('webdriver', function() {
 			done();
 		});
 	});
+
+	var booleanCapabilities;
+	switch(driverParams.desiredCapabilities.browserName) {
+		case 'internet explorer':
+			booleanCapabilities = [
+				'javascriptEnabled', 'takesScreenshot', 'handlesAlerts',
+				'cssSelectorsEnabled', 'nativeEvents'
+			];
+			break;
+		case 'firefox':
+			booleanCapabilities = [
+				'javascriptEnabled', 'takesScreenshot', 'handlesAlerts',
+				'cssSelectorsEnabled', 'nativeEvents',
+				'locationContextEnabled', 'applicationCacheEnabled',
+				'webStorageEnabled', 'rotatable', 'acceptSslCerts'
+			];
+			break;
+		default:
+			booleanCapabilities = [
+				'javascriptEnabled',
+				'takesScreenshot', 'handlesAlerts', 'databaseEnabled',
+				'locationContextEnabled', 'applicationCacheEnabled',
+				'browserConnectionEnabled', 'cssSelectorsEnabled',
+				'webStorageEnabled', 'rotatable', 'acceptSslCerts',
+				'nativeEvents'
+			];
+	}
+
 	var capabilitiesByTypes = {
 		string: ['browserName', 'version', 'platform'],
-		boolean: [
-			'javascriptEnabled',
-			'takesScreenshot', 'handlesAlerts', 'databaseEnabled',
-			'locationContextEnabled', 'applicationCacheEnabled',
-			'browserConnectionEnabled', 'cssSelectorsEnabled',
-			'webStorageEnabled', 'rotatable', 'acceptSslCerts',
-			'nativeEvents'
-		]
+		boolean: booleanCapabilities
 	};
-	Object.keys(capabilitiesByTypes).forEach(function(type) {
-		capabilitiesByTypes[type].forEach(function(field) {
+
+	_(capabilitiesByTypes).each( function(capabilitiesByType, type) {
+		_(capabilitiesByType).each(function(field) {
 			it(
 				'capabilities should have "' + field + '" of type "' + type + '"',
 				function(done) {
@@ -133,13 +197,13 @@ describe('webdriver', function() {
 	});
 
 	it('navigate to fixture page', function(done) {
-		driver.setUrl(getFixturePath('github/index.html'), expectForDriverAndDone(done));
+		driver.setUrl(getFixturePath(indexUrl), expectForDriverAndDone(done));
 	});
 
 	it('return current page url', function(done) {
 		driver.getUrl(function(err, url) {
 			if (err) return done(err);
-			expect(url).equal(getFixturePath('github/index.html'));
+			expect(url).equal(getFixturePath(indexUrl));
 			done();
 		});
 	});
@@ -365,7 +429,13 @@ describe('webdriver', function() {
 		it('get children elements of form using ' + using, function(done) {
 			formElement.getList('input[type=text]', params, function(err, elements) {
 				if (err) return done(err);
-				expect(elements.length).equal(2);
+				//ie don't work with input[type=password], he transform it to text type
+				if (driverParams.desiredCapabilities.browserName !=
+					'internet explorer') {
+					expect(elements.length).equal(2);
+				} else {
+					expect(elements.length).equal(3);
+				}
 				elements.forEach(expectWebElement);
 				done();
 			});
@@ -452,7 +522,6 @@ describe('webdriver', function() {
 				{timeout: 200},
 				function(err) {
 					expect(err).to.be.an(Error);
-					// console.log(err.message);
 					expect(err.message).equal(
 						'Timeout (200 ms) exceeded while waiting for ' +
 						'element #new-element3'
@@ -632,6 +701,10 @@ describe('webdriver', function() {
 
 	it('refresh current page', function(done) {
 		driver.refresh(expectForDriverAndDone(done));
+	});
+
+	it('wait for document ready (jquery)', function(done) {
+		driver.waitForDocumentReady(expectForDriverAndDone(done));
 	});
 
 	it('get search form element again (after page refresh)', function(done) {
@@ -836,8 +909,8 @@ describe('webdriver', function() {
 	function waitForUrlChangeFromIndexOnTermsOfService() {
 		it('wait for url change (on terms of service page url)', function(done) {
 			driver.waitForUrlChange(
-				getFixturePath('github/index.html'),
-				getFixturePath('github/terms-of-service.html'),
+				getFixturePath(indexUrl),
+				getFixturePath(termsOfServiceUrl),
 				expectForDriverAndDone(done)
 			);
 		});
@@ -856,8 +929,8 @@ describe('webdriver', function() {
 	function waitForUrlChangeFromTermsOfServiceOnIndex() {
 		it('wait for url change (on index page url)', function(done) {
 			driver.waitForUrlChange(
-				getFixturePath('github/terms-of-service.html'),
-				getFixturePath('github/index.html'),
+				getFixturePath(termsOfServiceUrl),
+				getFixturePath(indexUrl),
 				expectForDriverAndDone(done)
 			);
 		});
@@ -932,8 +1005,7 @@ describe('webdriver', function() {
 	waitForUrlChangeFromTermsOfServiceOnIndex();
 
 	it('make screenshot', function(done) {
-		//TODO: replace /tmp on os.tmpdir() after node update
-		var tmpFile = path.join('/tmp', 'nwd_screenshot_' + Date.now() + '.png');
+		var tmpFile = path.join(os.tmpdir(), 'nwd_screenshot_' + Date.now() + '.png');
 		driver.makeScreenshot(tmpFile, function(err) {
 			if (err) return done(err);
 			fs.exists(tmpFile, function(isExists) {
@@ -942,13 +1014,15 @@ describe('webdriver', function() {
 		});
 	});
 
-	it('get log', function(done) {
-		driver.getLog('browser', function(err, log) {
-			if (err) return done(err);
-			expect(log).to.be.an('array');
-			done();
+	if (driverParams.desiredCapabilities.browserName != 'internet explorer') {
+		it('get log', function(done) {
+			driver.getLog('browser', function(err, log) {
+				if (err) return done(err);
+				expect(log).to.be.an('array');
+				done();
+			});
 		});
-	});
+	}
 
 	it('delete session', function(done) {
 		driver.deleteSession(expectForDriverAndDone(done));

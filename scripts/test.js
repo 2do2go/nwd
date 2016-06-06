@@ -10,7 +10,7 @@ var out = fs.openSync('./phantomjs.log', 'a');
 var err = fs.openSync('./phantomjs.log', 'a');
 
 
-var runTests = function(callback) {
+var runTests = function() {
 	program['arguments']('[files...]')
 		.usage('[files...] [options]')
 		.description('Run all or selected tests')

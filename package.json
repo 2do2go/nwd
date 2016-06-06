@@ -26,7 +26,8 @@
   },
   "main": "./lib/index",
   "scripts": {
-	"test": "./scripts/test.js --reporter spec --bail --async-only",
+	"test": "npm run lint && ./scripts/test.js --reporter spec --bail --async-only",
+	"lint": "./node_modules/.bin/jshint .",
     "doc": "jsdoc lib docs/README.md -d docs/built"
   }
 }

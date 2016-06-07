@@ -25,7 +25,7 @@ var runTests = function() {
 		'./node_modules/.bin/mocha',
 		args,
 		{
-			stdio: [process.stdin, process.stdout, process.stderr]
+			stdio: 'inherit'
 		}
 	);
 };

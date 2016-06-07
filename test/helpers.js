@@ -14,7 +14,7 @@ exports.indexUrl = 'github/index.html';
 exports.termsOfServiceUrl = 'github/terms-of-service.html';
 
 var browserName = exports.browserName =
-	process.env.NODE_TESTUI_BROWSER || 'chrome';
+	process.env.NODE_TESTUI_BROWSER || 'phantom';
 
 var driverParams = {
 	host: process.env.NODE_TESTUI_HOST || '127.0.0.1',

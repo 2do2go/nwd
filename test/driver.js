@@ -9,7 +9,7 @@ var fs = require('fs');
 
 var driver = null;
 
-describe('webdriver', function() {
+describe('driver', function() {
 	this.timeout(helpers.testTimeout);
 
 	before(helpers.startStaticServer);
@@ -52,6 +52,44 @@ describe('webdriver', function() {
 			fs.exists(tmpFile, function(isExists) {
 				if (isExists) fs.unlink(tmpFile, done);
 			});
+		});
+	});
+
+	var searchInputElement = null;
+	it('get search input element', function(done) {
+		driver.get('#js-command-bar-field', function(err, element) {
+			if (err) return done(err);
+			helpers.expectWebElement(element);
+			searchInputElement = element;
+			done();
+		});
+	});
+
+	it(
+		'wait for search input detach(remove element after 50 ms)',
+		function(done) {
+			searchInputElement.waitForDetach(function(err) {
+				if (err) return done(err);
+				done();
+			});
+			helpers.elementCommand(driver, '#js-command-bar-field', 'remove', 50);
+		}
+	);
+
+	it('refresh current page', function(done) {
+		driver.refresh(helpers.expectForDriverAndDone(done));
+	});
+
+	it('wait for document ready (jquery)', function(done) {
+		driver.waitForDocumentReady(helpers.expectForDriverAndDone(done));
+	});
+
+	it('get search input element(should exist after refresh)', function(done) {
+		driver.get('#js-command-bar-field', function(err, element) {
+			if (err) return done(err);
+			helpers.expectWebElement(element);
+			searchInputElement = element;
+			done();
 		});
 	});
 

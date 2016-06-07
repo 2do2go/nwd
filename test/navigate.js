@@ -24,7 +24,6 @@ describe('navigates', function() {
 	it('click on term of service link', function(done) {
 		driver.get('[href="terms-of-service.html"]', function(err, termsElement) {
 			if (err) return done(err);
-			helpers.expectWebElement(termsElement);
 			termsElement.click(helpers.expectForElementAndDone(termsElement, done));
 		});
 	});
@@ -86,7 +85,6 @@ describe('navigates', function() {
 		it('get term of service link element', function(done) {
 			driver.get('[href="terms-of-service.html"]', function(err, element) {
 				if (err) return done(err);
-				helpers.expectWebElement(element);
 				termsElement = element;
 				done();
 			});

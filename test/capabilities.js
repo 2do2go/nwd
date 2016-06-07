@@ -24,36 +24,38 @@ describe('browser capabilities', function() {
 		});
 	});
 
-	var booleanCapabilities;
-	switch(helpers.driverParams.desiredCapabilities.browserName) {
-		case 'internet explorer':
-			booleanCapabilities = [
-				'javascriptEnabled', 'takesScreenshot', 'handlesAlerts',
-				'cssSelectorsEnabled', 'nativeEvents'
-			];
-			break;
-		case 'firefox':
-			booleanCapabilities = [
-				'javascriptEnabled', 'takesScreenshot', 'handlesAlerts',
-				'cssSelectorsEnabled', 'nativeEvents',
-				'locationContextEnabled', 'applicationCacheEnabled',
-				'webStorageEnabled', 'rotatable', 'acceptSslCerts'
-			];
-			break;
-		default:
-			booleanCapabilities = [
-				'javascriptEnabled',
-				'takesScreenshot', 'handlesAlerts', 'databaseEnabled',
-				'locationContextEnabled', 'applicationCacheEnabled',
-				'browserConnectionEnabled', 'cssSelectorsEnabled',
-				'webStorageEnabled', 'rotatable', 'acceptSslCerts',
-				'nativeEvents'
-			];
-	}
+	var booleanCapabilities = {
+		'internet explorer': [
+			'javascriptEnabled', 'takesScreenshot', 'handlesAlerts',
+			'cssSelectorsEnabled', 'nativeEvents'
+		],
+		'firefox': [
+			'javascriptEnabled', 'takesScreenshot', 'handlesAlerts',
+			'cssSelectorsEnabled', 'nativeEvents',
+			'locationContextEnabled', 'applicationCacheEnabled',
+			'webStorageEnabled', 'rotatable', 'acceptSslCerts'
+		],
+		'chrome': [
+			'javascriptEnabled',
+			'takesScreenshot', 'handlesAlerts', 'databaseEnabled',
+			'locationContextEnabled', 'applicationCacheEnabled',
+			'browserConnectionEnabled', 'cssSelectorsEnabled',
+			'webStorageEnabled', 'rotatable', 'acceptSslCerts',
+			'nativeEvents'
+		],
+		'phantom': [
+			'javascriptEnabled',
+			'takesScreenshot', 'handlesAlerts', 'databaseEnabled',
+			'locationContextEnabled', 'applicationCacheEnabled',
+			'browserConnectionEnabled', 'cssSelectorsEnabled',
+			'webStorageEnabled', 'rotatable', 'acceptSslCerts',
+			'nativeEvents'
+		]
+	};
 
 	var capabilitiesByTypes = {
 		string: ['browserName', 'version', 'platform'],
-		'boolean': booleanCapabilities
+		'boolean': booleanCapabilities[helpers.browserName]
 	};
 
 	_(capabilitiesByTypes).each( function(capabilitiesByType, type) {

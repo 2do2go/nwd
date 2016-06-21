@@ -7,8 +7,6 @@ var WebDriver = require('../lib').WebDriver;
 var driver = null;
 
 describe('script', function() {
-	this.timeout(helpers.testTimeout);
-
 	before(function(done) {
 		driver = new WebDriver(helpers.driverParams);
 		driver.init(done);

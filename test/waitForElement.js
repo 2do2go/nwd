@@ -7,8 +7,6 @@ var WebDriver = require('../lib').WebDriver;
 var driver = null;
 
 describe('`waitForElement` method', function() {
-	this.timeout(helpers.testTimeout);
-
 	before(helpers.startStaticServer);
 	before(function(done) {
 		driver = new WebDriver(helpers.driverParams);

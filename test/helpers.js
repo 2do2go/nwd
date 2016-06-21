@@ -8,8 +8,6 @@ var expect = require('expect.js');
 var WebDriver = require('../lib').WebDriver;
 var WebElement = require('../lib').WebElement;
 
-exports.testTimeout = 16000;
-
 exports.indexUrl = 'github/index.html';
 exports.termsOfServiceUrl = 'github/terms-of-service.html';
 

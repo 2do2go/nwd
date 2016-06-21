@@ -14,8 +14,6 @@ function itElementCommand(selector, action, after) {
 }
 
 describe('`get` method', function() {
-	this.timeout(helpers.testTimeout);
-
 	before(helpers.startStaticServer);
 
 	before(function(done) {

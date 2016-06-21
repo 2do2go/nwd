@@ -13,8 +13,6 @@ function itElementCommand(selector, action, after) {
 }
 
 describe('element attributes and properties', function() {
-	this.timeout(helpers.testTimeout);
-
 	before(helpers.startStaticServer);
 	before(function(done) {
 		driver = new WebDriver(helpers.driverParams);

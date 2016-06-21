@@ -10,8 +10,6 @@ var fs = require('fs');
 var driver = null;
 
 describe('driver', function() {
-	this.timeout(helpers.testTimeout);
-
 	before(helpers.startStaticServer);
 
 	it('init without errors', function(done) {

@@ -6,7 +6,6 @@ var phantomjs = require('phantomjs');
 var childProcess = require('child_process');
 var program = require('commander');
 var fs = require('fs');
-var Writable = require('stream').Writable;
 
 var runTests = function() {
 	program['arguments']('[files...]')
@@ -34,39 +33,7 @@ var runPhantom = function(callback) {
 
 	var startRetry = 1;
 	var maxStartRetryCount = 5;
-	var err = new Writable();
-
 	var logFile = fs.createWriteStream('./phantomjs.log');
-
-	err._write = function(chunk, encoding, _callback) {
-		logFile.write(chunk);
-		chunk = chunk.toString();
-
-		// restart phantom on crash, see rid #6786 for details
-		if (
-			startRetry < maxStartRetryCount &&
-			chunk &&
-			(
-				chunk.indexOf('pure virtual method called') !== -1 ||
-				chunk.indexOf('PhantomJS has crashed') !== -1 ||
-				chunk.indexOf('terminate called without an active exception') !== -1
-			)
-		) {
-			runPhantom(callback);
-			startRetry++;
-		} else {
-			_callback(new Error('phantomjs stderr: ' + chunk));
-		}
-	};
-
-	var out = new Writable();
-	out._write = function(chunk, encoding, _callback) {
-		logFile.write(chunk);
-		if (/GhostDriver - Main - running on port \d+/.test(chunk.toString())) {
-			callback(phantomProc);
-		}
-		_callback();
-	};
 
 	phantomProc = childProcess.spawn(phantomjs.path, [
 		'--webdriver', '127.0.0.1:4444',
@@ -79,8 +46,31 @@ var runPhantom = function(callback) {
 		]
 	});
 
-	phantomProc.stdout.pipe(out);
-	phantomProc.stderr.pipe(err);
+	phantomProc.stdout.on('data', function(data) {
+		logFile.write(data);
+		if (/GhostDriver - Main - running on port \d+/.test(data.toString())) {
+			callback(phantomProc);
+		}
+	});
+
+	phantomProc.stderr.on('data', function(data) {
+		logFile.write(data);
+		data = data.toString();
+
+		// restart phantom on crash, see rid #6786 for details
+		if (
+			startRetry < maxStartRetryCount &&
+			data &&
+			(
+				data.indexOf('pure virtual method called') !== -1 ||
+				data.indexOf('PhantomJS has crashed') !== -1 ||
+				data.indexOf('terminate called without an active exception') !== -1
+			)
+		) {
+			runPhantom(callback);
+			startRetry++;
+		}
+	});
 };
 
 var browser = process.env.NODE_TESTUI_BROWSER || 'phantom';

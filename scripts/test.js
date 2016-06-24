@@ -28,56 +28,68 @@ var runTests = function() {
 	);
 };
 
-var startRetry = 1;
-var maxStartRetryCount = 5;
-var logFile;
-
 var runPhantom = function(callback) {
-	var phantomProc;
+	var startRetry = 1;
+	var maxStartRetryCount = 5;
+	var logFile = fs.createWriteStream('./phantomjs.log');
 
-	phantomProc = childProcess.spawn(phantomjs.path, [
-		'--webdriver', '127.0.0.1:4444',
-		'--ignore-ssl-errors', 'yes'
-	], {
-		stdio: [
-			'inherit',
-			'pipe',
-			'pipe'
-		]
-	});
+	var spawnPhantom = function(callback) {
+		var phantomProc;
 
-	phantomProc.stdout.on('data', function(data) {
-		logFile.write(data);
-		if (/GhostDriver - Main - running on port \d+/.test(data.toString())) {
-			callback(phantomProc);
-		}
-	});
+		phantomProc = childProcess.spawn(phantomjs.path, [
+			'--webdriver', '127.0.0.1:4444',
+			'--ignore-ssl-errors', 'yes'
+		], {
+			stdio: [
+				'inherit',
+				'pipe',
+				'pipe'
+			]
+		});
 
-	phantomProc.stderr.on('data', function(data) {
-		logFile.write(data);
-		data = data.toString();
+		phantomProc.on('close', function(errorCode) {
+			if (errorCode) {
+				callback(new Error('non zero exit'));
+			}
+		});
+		phantomProc.on('error', callback);
 
-		// restart phantom on crash, see rid #6786 for details
-		if (
-			startRetry < maxStartRetryCount &&
-				data &&
+		phantomProc.stdout.on('data', function(data) {
+			logFile.write(data);
+			data = data.toString();
+			if (/GhostDriver - Main - running on port \d+/.test(data)) {
+				callback(null, phantomProc);
+			}
+		});
+
+		phantomProc.stderr.on('data', function(data) {
+			logFile.write(data);
+			data = data.toString();
+
+			// restart phantom on crash, see rid #6786 for details
+			if (
+				startRetry < maxStartRetryCount &&
 				(
-				data.indexOf('pure virtual method called') !== -1 ||
-				data.indexOf('PhantomJS has crashed') !== -1 ||
-				data.indexOf('terminate called without an active exception') !== -1
-			)
-		) {
-			runPhantom(callback);
-			startRetry++;
-		}
-	});
+					data.indexOf('pure virtual method called') !== -1 ||
+					data.indexOf('PhantomJS has crashed') !== -1 ||
+					data.indexOf('terminate called without an active exception') !== -1
+				)
+			) {
+				spawnPhantom(callback);
+				startRetry++;
+			}
+		});
+	};
+
+	spawnPhantom(callback);
 };
 
 var browser = process.env.NODE_TESTUI_BROWSER || 'phantom';
 
 if (browser === 'phantom') {
-	logFile = fs.createWriteStream('./phantomjs.log');
-	runPhantom(function(phantomProc) {
+	runPhantom(function(err, phantomProc) {
+		if (err) throw err;
+
 		var testsProc = runTests();
 		testsProc.on('close', function() {
 			phantomProc.kill();

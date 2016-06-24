@@ -30,7 +30,7 @@ var runTests = function() {
 
 var startRetry = 1;
 var maxStartRetryCount = 5;
-var logFile = fs.createWriteStream('./phantomjs.log');
+var logFile;
 
 var runPhantom = function(callback) {
 	var phantomProc;
@@ -76,6 +76,7 @@ var runPhantom = function(callback) {
 var browser = process.env.NODE_TESTUI_BROWSER || 'phantom';
 
 if (browser === 'phantom') {
+	logFile = fs.createWriteStream('./phantomjs.log');
 	runPhantom(function(phantomProc) {
 		var testsProc = runTests();
 		testsProc.on('close', function() {

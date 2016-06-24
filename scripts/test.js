@@ -28,12 +28,12 @@ var runTests = function() {
 	);
 };
 
+var startRetry = 1;
+var maxStartRetryCount = 5;
+var logFile = fs.createWriteStream('./phantomjs.log');
+
 var runPhantom = function(callback) {
 	var phantomProc;
-
-	var startRetry = 1;
-	var maxStartRetryCount = 5;
-	var logFile = fs.createWriteStream('./phantomjs.log');
 
 	phantomProc = childProcess.spawn(phantomjs.path, [
 		'--webdriver', '127.0.0.1:4444',
@@ -60,8 +60,8 @@ var runPhantom = function(callback) {
 		// restart phantom on crash, see rid #6786 for details
 		if (
 			startRetry < maxStartRetryCount &&
-			data &&
-			(
+				data &&
+				(
 				data.indexOf('pure virtual method called') !== -1 ||
 				data.indexOf('PhantomJS has crashed') !== -1 ||
 				data.indexOf('terminate called without an active exception') !== -1

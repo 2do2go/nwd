@@ -6,6 +6,7 @@ var path = require('path');
 var helpers = require('./helpers');
 var os = require('os');
 var fs = require('fs');
+var _ = require('underscore');
 
 var driver = null;
 
@@ -15,10 +16,6 @@ describe('driver', function() {
 	it('init without errors', function(done) {
 		driver = new WebDriver(helpers.driverParams);
 		driver.init(helpers.expectForDriverAndDone(done));
-	});
-
-	it('delete cookie', function(done) {
-		driver.deleteCookie(helpers.expectForDriverAndDone(done));
 	});
 
 	it('maximize window', function(done) {
@@ -100,6 +97,46 @@ describe('driver', function() {
 			});
 		});
 	}
+
+	it('get cookies', function(done) {
+		driver.getCookie(function(err, cookies) {
+			if (err) return done(err);
+			expect(cookies).to.be.an('array');
+			expect(cookies.length).to.be.above(0);
+			cookies = _(cookies).indexBy('name');
+			expect(cookies).to.have.property('foo');
+			expect(cookies.foo.value).to.equal('bar');
+			done();
+		});
+	});
+
+	it('delete cookie', function(done) {
+		driver.deleteCookie('foo', helpers.expectForDriverAndDone(done));
+	});
+
+	it('check deleted cookie', function(done) {
+		driver.getCookie(function(err, cookies) {
+			if (err) return done(err);
+			expect(cookies).to.be.an('array');
+			expect(cookies.length).to.be.above(0);
+			cookies = _(cookies).indexBy('name');
+			expect(cookies).not.have.property('foo');
+			done();
+		});
+	});
+
+	it('delete all cookies', function(done) {
+		driver.deleteCookie(helpers.expectForDriverAndDone(done));
+	});
+
+	it('check cookies is empty', function(done) {
+		driver.getCookie(function(err, cookies) {
+			if (err) return done(err);
+			expect(cookies).to.be.an('array');
+			expect(cookies).to.have.length(0);
+			done();
+		});
+	});
 
 	it('delete session', function(done) {
 		driver.deleteSession(helpers.expectForDriverAndDone(done));

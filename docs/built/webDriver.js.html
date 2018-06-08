@@ -32,7 +32,8 @@ var http = require('http'),
 	path = require('path'),
 	utils = require('./utils'),
 	errors = require('./errors'),
-	WebElement = require('./webElement').WebElement;
+	WebElement = require('./webElement').WebElement,
+	_ = require('underscore');
 
 function returnSelf(callback, self) {
 	return function(err) {
@@ -98,9 +99,13 @@ WebDriver.prototype._initElement = function() {
 	 *
 	 * @example
 	 * // driver is an instance of WebDriver
-	 * driver.element.sendKeys('[name="user[login]"]', 'patrik', function(err, element) {
-	 *   // element is WebElement which was get
-	 * });
+	 * driver.element.sendKeys(
+	 *   '[name="user[login]"]',
+	 *   'patrik',
+	 *   function(err, element) {
+	 *     // element is WebElement which was get
+	 *   }
+	 * );
 	 *
 	 * @example
 	 * // driver is an instance of WebDriver
@@ -167,9 +172,11 @@ WebDriver.prototype._cmd = function(params, callback) {
 			},
 			data: buferData
 		};
-	var req = request(requestParams, function(err, res) {
+
+	request(requestParams, function(err, res) {
 		if (err) return callback(err);
 		res.data = res.data ? self._strip(res.data.toString()) : '{}';
+
 		try {
 			res.data = JSON.parse(res.data);
 		} catch(err) {
@@ -184,7 +191,11 @@ WebDriver.prototype._cmd = function(params, callback) {
 			return callback(new errorConstructor());
 		}
 		// return `res` if it needed, otherwise `res.data.value`
-		callback(null, params.resNeeded ? res : res.data.value);
+		if (params.path === '/refresh') {
+			callback(null, params.resNeeded ? res : res.data.value, true);
+		} else {
+			callback(null, params.resNeeded ? res : res.data.value);
+		}
 	});
 };
 
@@ -277,104 +288,160 @@ var sweetenCssSelector = function(value) {
 	return value;
 };
 
-var jqueryInjection = 'function ___nwdJquery() {' +
-	fs.readFileSync(path.resolve(
-		__dirname, '..', 'injections', 'jquery.min.js'
-	)) +
-'}';
+var injections = {
+	/*jshint ignore:start*/
+	getElementsFn: utils.getInjectionSource(function() {
+		//getting elements by jquery `selector`
+		window.___nwdGetElements = function(selector, parent, chain, cssFilter) {
+			cssFilter = cssFilter || {};
+			var elements = null;
+			var $ = window.___nwdJquery;
+			elements = parent ? $(selector, parent) : $(selector);
 
-var jqueryGetElementsInjection = utils.getInjectionSource(function() {
-	//getting elements by jquery `selector`
-	function ___nwdJqGetElements(selector, parent, chain, cssFilter) {
-		cssFilter = cssFilter || {};
-		var elements = null;
-		var $ = window.___nwdJquery;
-		elements = $(selector, parent);
-		if (elements && elements.length && chain) {
-			$.each(chain, function(index, object) {
-				var func = null, args = null;
-				//get function and arguments
-				$.each(object, function(key, value) {
-					func = key;
-					args = value;
-					return;
-				});
-				//wrap arguments into array if needed
-				args = $.isArray(args) ? args : [args];
-				if (!elements[func]) {
-					throw new Error('Unknown jquery method: ' + func);
-				}
-				elements = elements[func].apply(elements, args);
-			});
-		}
-		if (elements && elements.length && cssFilter) {
-			elements = elements.filter(function(index, element) {
-				var allFiltersMatch = true;
-				for (var prop in cssFilter) {
-					if ($(element).css(prop) !== cssFilter[prop]) {
-						allFiltersMatch = false;
-						break;
+			if (elements && elements.length && chain) {
+				$.each(chain, function(index, object) {
+					var func = null, args = null;
+
+					//get function and arguments
+					$.each(object, function(key, value) {
+						func = key;
+						args = value;
+						return;
+					});
+
+					//wrap arguments into array if needed
+					args = $.isArray(args) ? args : [args];
+
+					if (!elements[func]) {
+						throw new Error('Unknown jquery method: ' + func);
 					}
-				}
-				return allFiltersMatch;
-			});
-		}
-		return elements && elements.length ? elements.get() : [];
-	}
-});
 
-var jqueryAndGetElementsInjection = jqueryInjection + jqueryGetElementsInjection;
+					elements = elements[func].apply(elements, args);
+				});
+			}
+
+			if (elements && elements.length && cssFilter) {
+				elements = elements.filter(function(index, element) {
+					var allFiltersMatch = true;
+
+					for (var prop in cssFilter) {
+						if ($(element).css(prop) !== cssFilter[prop]) {
+							allFiltersMatch = false;
+							break;
+						}
+					}
+
+					return allFiltersMatch;
+				});
+			}
+
+			return elements && elements.length ? elements.get() : [];
+		};
+	}),
+	checkJqueryFn: utils.getInjectionSource(function() {
+		return typeof window.___nwdJquery === 'function';
+	}),
+	checkGetElementsFn: utils.getInjectionSource(function() {
+		return typeof window.___nwdGetElements === 'function';
+	}),
+	getElements: utils.getInjectionSource(function() {
+		return window.___nwdGetElements.apply(null, arguments);
+	}),
+	waitForDocumentReady: utils.getInjectionSource(function() {
+		var timeout = arguments[0],
+			callback = arguments[1];
+
+		var $ = window.___nwdJquery;
+
+		var timeoutHandle = setTimeout(function() {
+			callback(false);
+		}, timeout);
+
+		$(document).ready(function() {
+			clearTimeout(timeoutHandle);
+			callback(true);
+		});
+	}),
+	/*jshint ignore:end*/
+	jqueryFn: (
+		'(function() { ' +
+			fs.readFileSync(path.resolve(__dirname, '..', 'injections', 'jquery.js')) +
+		' })();'
+	)
+};
+
+WebDriver.prototype._injectJqueryIfNotExists = function(callback) {
+	var self = this;
+
+	this.execute(injections.checkJqueryFn, [], false, function(err, exists) {
+		if (err) return callback(err);
+
+		if (exists) {
+			callback(null);
+		} else {
+			self.execute(injections.jqueryFn, [], false, callback);
+		}
+	});
+};
+
+WebDriver.prototype._injectGetElementsIfNotExists = function(callback) {
+	var self = this;
+
+	this._injectJqueryIfNotExists(function(err) {
+		if (err) return callback(err);
+
+		self.execute(injections.checkGetElementsFn, [], false, function(err, exists) {
+			if (err) return callback(err);
+
+			if (exists) {
+				callback(null);
+			} else {
+				self.execute(injections.getElementsFn, [], false, callback);
+			}
+		});
+	});
+};
 
 //strategy for getting elements via client jquery
 var jqueryGetElementIds = function(selector, params, callback) {
 	var self = this;
-	function execute(addInjection) {
+
+	this._injectGetElementsIfNotExists(function(err) {
+		if (err) return callback(err);
+
 		self.execute(
-			(addInjection || '') + utils.getInjectionSource(function() {
-				if (typeof window.___nwdJquery !== 'function') {
-					if (typeof ___nwdJquery !== 'function') return 'needJquery';
-					___nwdJquery();
-					window.___nwdJquery = jQuery.noConflict(true);
-				}
-				if (typeof window.___nwdJqGetElements !== 'function') {
-					if (typeof ___nwdJqGetElements !== 'function') return 'needFunc';
-					window.___nwdJqGetElements = ___nwdJqGetElements;
-				}
-				return ___nwdJqGetElements.apply(null, arguments);
-			}),
+			injections.getElements,
 			[
 				selector,
-				params.parentId && {ELEMENT: params.parentId},
+				params.parentId ? {ELEMENT: params.parentId} : null,
 				params.chain,
 				params.cssFilter
 			],
 			false,
 			function(err, result) {
 				if (err) return callback(err);
-				if (typeof result === 'string') {
-					execute(result === 'needJquery' ? jqueryAndGetElementsInjection : jqueryGetElementsInjection);
-				} else {
-					var elements = result;
-					elements = elements.map(function(element) {
-						return element.ELEMENT;
-					});
-					if (!elements.length) {
-						if (params.isSingle) {
-							callback(new errors.NoSuchElementError({
-								element: selector,
-								using: params.using
-							}));
-						} else {
-							callback(null, []);
-						}
+
+				var elements = result;
+
+				elements = elements.map(function(element) {
+					return element.ELEMENT;
+				});
+
+				if (!elements.length) {
+					if (params.isSingle) {
+						callback(new errors.NoSuchElementError({
+							element: selector,
+							using: params.using
+						}));
 					} else {
-						callback(null, elements);
+						callback(null, []);
 					}
+				} else {
+					callback(null, elements);
 				}
 			}
 		);
-	}
-	execute();
+	});
 };
 
 var customStrategyHash = {
@@ -446,7 +513,11 @@ WebDriver.prototype._getIds = function(selector, params, callback) {
 			if (err && params.noError && err instanceof errors.NoSuchElementError) {
 				return callback(null, null);
 			}
-			callback(parametrizeError(err), !err && (params.isSingle ? elements[0] : elements));
+
+			callback(
+				parametrizeError(err),
+				!err && (params.isSingle ? elements[0] : elements)
+			);
 		});
 	} else {
 		var plural = params.isSingle ? '' : 's';
@@ -464,9 +535,13 @@ WebDriver.prototype._getIds = function(selector, params, callback) {
 			if (err && params.noError && err instanceof errors.NoSuchElementError) {
 				return callback(null, null);
 			}
-			callback(parametrizeError(err), !err && (params.isSingle ? value.ELEMENT : value.map(function(item) {
-				return item.ELEMENT;
-			})));
+
+			callback(
+				parametrizeError(err),
+				!err && (params.isSingle ? value.ELEMENT : value.map(function(item) {
+					return item.ELEMENT;
+				}))
+			);
 		});
 	}
 
@@ -503,7 +578,8 @@ WebDriver.prototype.setTimeout = function(type, timeout, callback) {
 
 /**
  * Set timeouts
- * @param {Object} timeout Object key - timeout type, value - timeout value in ms
+ * @param {Object} timeout Object key - timeout type, value - timeout
+ * value in ms
  * @param {Function} callback(err:Error)
  */
 WebDriver.prototype.setTimeouts = function(timeouts, callback) {
@@ -522,10 +598,10 @@ WebDriver.prototype.setTimeouts = function(timeouts, callback) {
 /**
  * Get timeout by type
  * @param {String} type
- * @returns {Number} current timeout for type
+ * @param {Function} callback(err:Error,timeout:Number)
  */
-WebDriver.prototype.getTimeout = function(type) {
-	return this.timeouts[type];
+WebDriver.prototype.getTimeout = function(type, callback) {
+	callback(null, this.timeouts[type]);
 };
 
 /**
@@ -554,7 +630,7 @@ WebDriver.prototype.execute = function(script, args, isAsync, callback) {
  * `selector` and `params` could accept same values as at `get`.
  * @param {String} selector
  * @param {Object} [params]
- * @param {Function} callback(err:Error,element:WebElement)
+ * @param {Function} callback(err:Error,element:WebDriver)
  */
 WebDriver.prototype.waitForElement = function(selector, params, callback) {
 	callback = utils.isFunction(params) ? params : callback;
@@ -562,24 +638,14 @@ WebDriver.prototype.waitForElement = function(selector, params, callback) {
 	var self = this;
 	self.waitFor(
 		function(waitCallback) {
-			function getElement() {
-				self.get(selector, params, function(err, element) {
-					if (err) {
-						if (err instanceof errors.NoSuchElementError) {
-							getElement();
-						} else {
-							return callback(err);	
-						}
-					} else {
-						waitCallback(Boolean(element));
-					}
-				});
-			}
-			getElement();
+			self.get(selector, params, function(err, element) {
+				if (err && (err instanceof errors.NoSuchElementError)) err = null;
+				waitCallback(err, Boolean(element));
+			});
 		}, {
 			noError: params.noError,
 			errorMessage: 'waiting for element ' + selector,
-			timeout: self.timeouts.waitForElement
+			timeout: params.timeout || self.timeouts.waitForElement
 		},
 		callback
 	);
@@ -590,49 +656,73 @@ WebDriver.prototype.waitForElement = function(selector, params, callback) {
  * `selector` and `params` could accept same values as at `get`.
  * @param {Function} callback(err:Error,driver:WebDriver)
  */
-WebDriver.prototype.waitForElementAbsent = function(selector, params, callback) {
-	callback = utils.isFunction(params) ? params : callback;
-	params = !utils.isFunction(params) ? params : {};
-	var self = this;
-	this.get(selector, utils.extend({noError: true}, params), function(err, element) {
-		if (err) return callback(err);
-		if (!element) return callback(null, self);
-		element.waitForDisappear(callback);
-	});
-};
+WebDriver.prototype.waitForElementAbsent =
+	function(selector, params, callback) {
+		callback = utils.isFunction(params) ? params : callback;
+		params = !utils.isFunction(params) ? params : {};
+		var self = this;
+		this.get(
+			selector,
+			utils.extend({noError: true}, params),
+			function(err, element) {
+				if (err) return callback(err);
+				if (!element) return callback(null, self);
+				element.waitForDisappear(callback);
+			}
+		);
+	};
 
 /**
  * Wait for url change from `oldUrl` to `newUrl`.
  * Query string is not involved in url comparation.
  * @param {String|RegExp} oldUrl Old url (will be ignored if falsy)
  * @param {String|RegExp} newUrl New url (will be ignored if falsy)
+ * @param {Object} [params]
+ * @param {Boolean} [params.splitQueryStringFromCurrentUrl=false]
+ * the parameter determines whether the current URL
+ * will be checked without querystring
  * @param {Function} callback(err:Error,driver:WebDriver)
  */
-WebDriver.prototype.waitForUrlChange = function(oldUrl, newUrl, callback) {
-	var self = this;
-	if (!oldUrl && !newUrl) return callback(new Error(
-		'Both of new and old url can`t be falsy.'
-	));
-	self.waitFor(
-		function(waitCallback) {
-			self.getUrl(function(err, url) {
-				if (err) return callback(err);
-				// remove query string
-				url = url.replace(/\?.*$/, '');
-				waitCallback(
-					(utils.isRegExp(oldUrl) ? !oldUrl.test(url) : oldUrl !== url) &&
-					(!newUrl || (utils.isRegExp(newUrl) ? newUrl.test(url) : newUrl === url))
-				);
-			});
-		}, {
-			errorMessage: 'waiting for url change' +
-				(oldUrl ? ' from ' + oldUrl : '') +
-				(newUrl ? ' to ' + newUrl : ''),
-			timeout: self.timeouts.waitForUrlChange
-		},
-		callback
-	);
-};
+WebDriver.prototype.waitForUrlChange =
+	function(oldUrl, newUrl, params, callback) {
+		if (utils.isFunction(params)) {
+			callback = params;
+			params = {};
+		}
+
+		params = _({
+			splitQueryStringFromCurrentUrl: false
+		}).extend(params);
+
+		var self = this;
+		if (!oldUrl && !newUrl) return callback(new Error(
+			'Both of new and old url can`t be falsy.'
+		));
+		self.waitFor(
+			function(waitCallback) {
+				self.getUrl(function(err, url) {
+					if (err) return waitCallback(err);
+
+					if (params.splitQueryStringFromCurrentUrl) {
+						// remove query string
+						url = url.replace(/\?.*$/, '');
+					}
+
+					waitCallback(
+						null,
+						(utils.isRegExp(oldUrl) ? !oldUrl.test(url) : oldUrl !== url) &&
+							(!newUrl || (utils.isRegExp(newUrl) ? newUrl.test(url) : newUrl === url))
+					);
+				});
+			}, {
+				errorMessage: 'waiting for url change' +
+					(oldUrl ? ' from ' + oldUrl : '') +
+					(newUrl ? ' to ' + newUrl : ''),
+				timeout: self.timeouts.waitForUrlChange
+			},
+			callback
+		);
+	};
 
 /**
  * Wait for redirect to `newUrl`.
@@ -641,7 +731,10 @@ WebDriver.prototype.waitForUrlChange = function(oldUrl, newUrl, callback) {
  * @param {Function} callback(err:Error,driver:WebDriver)
  */
 WebDriver.prototype.waitForRedirect = function(newUrl, callback) {
-	this.waitForUrlChange('', newUrl, callback);
+	this.waitForUrlChange({
+		oldUrl: '',
+		newUrl: newUrl
+	}, callback);
 };
 
 /**
@@ -650,49 +743,29 @@ WebDriver.prototype.waitForRedirect = function(newUrl, callback) {
  */
 WebDriver.prototype.waitForDocumentReady = function(callback) {
 	var self = this;
-	function execute(addInjection) {
+
+	this._injectJqueryIfNotExists(function(err) {
+		if (err) return callback(err);
+
 		self.execute(
-			(addInjection || '') + utils.getInjectionSource(function() {
-				var timeout = arguments[0],
-					callback = arguments[1];
-				if (typeof window.___nwdJquery !== 'function') {
-					if (typeof ___nwdJquery !== 'function') {
-						callback('needJquery');
-						return;
-					}
-					___nwdJquery();
-					window.___nwdJquery = jQuery.noConflict(true);
-				}
-				var $ = window.___nwdJquery;
-				setTimeout(function() {
-					callback(false);
-				}, timeout)
-				$(document).ready(function() {
-					callback(true);
-				});
-			}),
+			injections.waitForDocumentReady,
 			[self.timeouts.waitFor],
 			true,
 			function(err, result) {
 				if (err) return callback(err);
-				if (result === 'needJquery') {
-					execute(jqueryInjection);
-				} else {
-					if (result === true) {
-						callback(null, self);
-					} else {
-						callback(new Error(
-							result === false
-								? 'Timeout exceeded while waiting for document ready'
-								: 'Unexpected result while waiting for document ready: ' + result 
 
-						));
-					}
+				if (result === true) {
+					callback(null, self);
+				} else {
+					callback(new Error(
+						result === false ?
+						'Timeout exceeded while waiting for document ready' :
+						('Unexpected result while waiting for document ready: ' + result)
+					));
 				}
 			}
 		);
-	}
-	execute();
+	});
 };
 
 
@@ -706,33 +779,58 @@ WebDriver.prototype.waitForDocumentReady = function(callback) {
 WebDriver.prototype.waitFor = function(func, params, callback) {
 	callback = utils.isFunction(params) ? params : callback;
 	params = !utils.isFunction(params) ? params : {};
+
 	var self = this,
-		start = Date.now(),
 		timeout = params.timeout || self.timeouts.waitFor,
-		delay = 20,
-		isTimeoutExceeded = false,
-		isDone = false;
-	function execute() {
-		setTimeout(function() {
-			func(function(done) {
-				isDone = done;
-				if (done && !isTimeoutExceeded) {
-					callback(null, self);
-				} else if (!isTimeoutExceeded) {
-					execute();
-				}
-			});
-		}, delay);
-		setTimeout(function() {
-			if (!isDone) {
-				isTimeoutExceeded = true;
-				callback(params.noError ? null : new Error(
-					'Timeout (' + timeout + ' ms) exceeded' +
-					(params.errorMessage ? ' while ' + params.errorMessage : '')
-				));
-			}
-		}, timeout);
+		delay = 20;
+
+	var executeTimeoutHandle = null,
+		waitTimeoutHandle = null;
+
+	//TODO: refactor function that use this variable
+	var isWaitingTimeExpired = false;
+
+	var clearTimeouts = function() {
+		if (executeTimeoutHandle) {
+			clearTimeout(executeTimeoutHandle);
+			executeTimeoutHandle = null;
+		}
+
+		if (waitTimeoutHandle) {
+			clearTimeout(waitTimeoutHandle);
+			waitTimeoutHandle = null;
+		}
 	};
+
+	var execute = function() {
+		func(function(err, done) {
+			if (isWaitingTimeExpired) {
+				return;
+			}
+
+			if (err) {
+				clearTimeouts();
+				return callback(err);
+			}
+
+			if (done) {
+				clearTimeouts();
+				callback(null, self);
+			} else {
+				executeTimeoutHandle = setTimeout(execute, delay);
+			}
+		});
+	};
+
+	waitTimeoutHandle = setTimeout(function() {
+		isWaitingTimeExpired = true;
+
+		callback(params.noError ? null : new Error(
+			'Timeout (' + timeout + ' ms) exceeded' +
+			(params.errorMessage ? ' while ' + params.errorMessage : '')
+		));
+	}, timeout);
+
 	execute();
 };
 
@@ -883,6 +981,14 @@ WebDriver.prototype.sendKeys = function(value, callback) {
 	}, returnSelf(callback, this));
 };
 
+WebDriver.prototype.getLog = function(type, callback) {
+	this._cmd({
+		path: '/log',
+		method: 'POST',
+		data: {type: type}
+	}, callback);
+};
+
 /**
  * Retrieve the capabilities of the current session
  * @param {Function} callback(err:Error,capabilities:Object)
@@ -910,7 +1016,7 @@ exports.WebDriver = WebDriver;
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Dec 23 2014 15:23:37 GMT+0300 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Fri Jun 08 2018 15:35:37 GMT+0300 (MSK)
 </footer>
 
 <script> prettyPrint(); </script>

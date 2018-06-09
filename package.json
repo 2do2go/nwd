@@ -13,9 +13,7 @@
 		"test",
 		"browser"
 	],
-	"dependencies": {
-		"underscore": "1.8.3"
-	},
+	"dependencies": {},
 	"devDependencies": {
 		"commander": "2.8.1",
 		"expect.js": "0.2.0",
@@ -23,7 +21,8 @@
 		"jshint": "2.4.4",
 		"mocha": "1.11.0",
 		"node-static": "0.7.10",
-		"phantomjs": "1.9.7-8"
+		"phantomjs": "1.9.7-8",
+		"underscore": "1.8.3"
 	},
 	"main": "./lib/index",
 	"scripts": {

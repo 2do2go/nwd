@@ -128,6 +128,46 @@ describe('navigates', function() {
 	goBack();
 	waitForUrlChangeFromTermsOfServiceOnIndex();
 
+	it('navigate to terms of service fixture page with qs params', function(done) {
+		driver.setUrl(
+			helpers.getFixturePath(helpers.termsOfServiceUrl) + '?params1=value1',
+			helpers.expectForDriverAndDone(done)
+		);
+	});
+
+	it(
+		'wait for url change (on terms of service page url with qs params) ' +
+		'without omit qs params',
+		function(done) {
+			driver.waitForUrlChange(
+				helpers.getFixturePath(helpers.indexUrl),
+				helpers.getFixturePath(helpers.termsOfServiceUrl) + '?params1=value1',
+				helpers.expectForDriverAndDone(done)
+			);
+		}
+	);
+
+	it('navigate to index fixture page with qs params', function(done) {
+		driver.setUrl(
+			helpers.getFixturePath(helpers.termsOfServiceUrl) + '?params1=value1',
+			helpers.expectForDriverAndDone(done)
+		);
+	});
+
+	it(
+		'wait for url change (on index page url with qs params) with omit qs params',
+		function(done) {
+			driver.waitForUrlChange(
+				helpers.getFixturePath(helpers.indexUrl),
+				helpers.getFixturePath(helpers.termsOfServiceUrl),
+				{
+					omitQueryString: true
+				},
+				helpers.expectForDriverAndDone(done)
+			);
+		}
+	);
+
 	after(helpers.stopStaticServer);
 	after(function(done) {
 		driver.deleteSession(done);
